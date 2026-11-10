@@ -1,6 +1,6 @@
 # Resultados de pruebas H3 (sin robot)
 
-Versión del software: commit `sin-commit` (+ cambios sin commitear si los hay) · 2026-11-10 11:24
+Versión del software: commit `b5534fa` (+ cambios sin commitear si los hay) · 2026-11-10 11:20
 
 | Caso | Nivel | Requisitos | Escenarios | Pruebas | Veredicto |
 |---|---|---|---|---|---|

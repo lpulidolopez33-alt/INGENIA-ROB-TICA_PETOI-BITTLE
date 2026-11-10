@@ -15,7 +15,7 @@ Software del reto Bittle: la voz se reconoce, se valida y, solo si es una orden 
 | Resultados y trazabilidad (generados) | `evidencias/` |
 | Configuración de Spec Kit | `.specify/`, `.github/skills/` |
 
-> Estado: `specs/` se escribió a partir del H1 v0.1; **falta actualizarlo al H1 v0.2** (consultas «historial»/«estado», español e inglés, escenarios ESC-01 a ESC-13). El código y los casos de prueba ya siguen el H1 v0.2.
+> Estado: `specs/` está alineado con el H1 v0.2 (versión 0.3 de los documentos). Pendiente de ensayo con hardware (H4) y de resolver OPEN-09 antes de mover el robot.
 
 ## Comandos
 ```bash
