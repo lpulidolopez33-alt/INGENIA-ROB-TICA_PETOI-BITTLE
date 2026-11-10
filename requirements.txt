@@ -1,0 +1,5 @@
+pyserial==3.5
+pytest>=8
+# Solo para ejecutar con micrófono y reconocimiento real (no necesarias para las pruebas H3):
+vosk
+sounddevice

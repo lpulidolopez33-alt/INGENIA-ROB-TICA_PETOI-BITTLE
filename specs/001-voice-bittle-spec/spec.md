@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "Genera la especificación funcional del sistema VOICE-BITTLE tomando como fuente principal docs/h1/H1.md y respetando la constitución del proyecto. Incluye ESC-01 a ESC-08, NEC-01 a NEC-05 y las categorías RF, RR, RS, RI, RO, RFI, RU, RM y RD. Conserva trazabilidad y criterios verificables, documenta inconsistencias y OPEN-01 a OPEN-12. No modificar H1 ni implementar código; limitarse a H2."
+**Input**: User description: "Genera la especificación funcional del sistema VOICE-BITTLE tomando como fuente principal docs/h1/H1_v0.2.pdf y respetando la constitución del proyecto. Incluye ESC-01 a ESC-08, NEC-01 a NEC-05 y las categorías RF, RR, RS, RI, RO, RFI, RU, RM y RD. Conserva trazabilidad y criterios verificables, documenta inconsistencias y OPEN-01 a OPEN-12. No modificar H1 ni implementar código; limitarse a H2."
 
 ## Clarifications
 
@@ -363,7 +363,7 @@ identified impact without selecting an answer.
 
 ## Assumptions
 
-- H1 (`docs/h1/H1.md`) is the primary source; this specification does not amend it.
+- H1 (`docs/h1/H1_v0.2.pdf`) is the primary source; this specification does not amend it.
 - The current voice-action baseline is limited to sitting (`ksit`) and standing (`kup`), plus
   safe rejection and the additional H1 behaviors. Other Petoi skills are not added as voice
   commands.
