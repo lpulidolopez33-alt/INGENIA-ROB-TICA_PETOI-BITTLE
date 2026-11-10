@@ -1,0 +1,17 @@
+{
+  "_nota": "Vocabulario canónico de H1 v0.2 sección 2.5. Sinónimos pendientes (OPEN-06). kup pendiente de confirmar en el firmware (OPEN-10).",
+  "intenciones": [
+    {"id": "sentarse", "tipo": "movimiento", "token": "ksit",
+     "descripcion": "Envía ksit a Bittle",
+     "frases": {"es": ["siéntate"], "en": ["sit"]}},
+    {"id": "ponerse_de_pie", "tipo": "movimiento", "token": "kup",
+     "descripcion": "Envía kup a Bittle",
+     "frases": {"es": ["ponte de pie"], "en": ["stand up"]}},
+    {"id": "historial", "tipo": "consulta", "token": null,
+     "descripcion": "Muestra el historial de órdenes; no envía comandos",
+     "frases": {"es": ["historial"], "en": ["history"]}},
+    {"id": "estado", "tipo": "consulta", "token": null,
+     "descripcion": "Informa del enlace y del estado de movimiento; no envía comandos",
+     "frases": {"es": ["estado"], "en": ["status"]}}
+  ]
+}

@@ -2,7 +2,7 @@
 
 **Branch**: `001-voice-bittle-spec` | **Date**: 2026-10-26 | **Spec**: [spec.md](./spec.md)
 
-**Input**: H2 technical plan based on `docs/h1/H1.md`, `spec.md`, and
+**Input**: H2 technical plan based on `docs/h1/H1_v0.2.pdf`, `spec.md`, and
 `.specify/memory/constitution.md`. This document specifies architecture and validation planning;
 it does not authorize code implementation.
 
