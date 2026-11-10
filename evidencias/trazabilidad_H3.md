@@ -1,6 +1,6 @@
 # Trazabilidad requisito → prueba → resultado (H3)
 
-Versión del software: commit `sin-commit` (+ cambios sin commitear si los hay) · 2026-11-10 11:24
+Versión del software: commit `b5534fa` (+ cambios sin commitear si los hay) · 2026-11-10 11:20
 
 | Requisito | Modo de verificación (H1 6.3) | Casos sin robot | Estado H3 |
 |---|---|---|---|
