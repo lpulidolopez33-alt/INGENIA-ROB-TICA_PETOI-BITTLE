@@ -1,5 +1,12 @@
 # Informe de desarrollo VOICE-BITTLE — H3
 
+> **Alcance histórico:** este informe y sus resultados se refieren a la entrega
+> H3 y a `voice_bittle.py`, cuya consola física permanece bloqueada. El
+> repositorio incorpora posteriormente `bittle_voz.py`, secuencias y otras
+> interfaces con un alcance diferente. Para el estado actual consulta
+> [README.md](../../README.md), [SECUENCIAS.md](../../SECUENCIAS.md) y
+> [PANEL_WEB.md](../../PANEL_WEB.md). Este informe no valida sus movimientos.
+
 Fecha de entrega: 2026-11-12 (Europe/Madrid). Estado: software funcional en
 simulación; integración física preparada parcialmente y BLOQUEADA. No se ha
 conectado ni movido Bittle, ni aprobado parámetros o procedimientos pendientes.
@@ -207,7 +214,7 @@ La revisión actual alcanza 124 pruebas / 37 casos. Cambios: confianza mínima p
 palabra en lugar de media, decodificación abierta en vez de gramática restringida,
 control de silencio PCM nulo, capturas identificadas consumidas una vez, caducidad,
 y descarte de captura si se desactiva/reactiva escucha mientras se procesa.
-Se añaden test_revision_voz.py, ensayo_audio_sintetico.py y empaquetar.py.
+En aquella revisión se añadieron `test_revision_voz.py`, `ensayo_audio_sintetico.py` y `empaquetar.py`; las dos últimas herramientas no están presentes en el `main` revisado.
 
 El modelo ES aportado por el usuario se conserva, se carga y se ensaya con PCM
 sintético; tres señales produjeron texto vacío. No se usa micrófono ni se pronuncian
@@ -220,7 +227,7 @@ originales históricos. Se archivan spec/plan/tasks de aa3ea8a byte por byte,
 separados y marcados no vigentes. El ZIP integral incluye fuentes, documentación,
 pruebas, herramientas, configuración y evidencias; excluye .git, .venv, modelos,
 cachés y logs locales. Guías explican instalación externa. No push/pull/merge.
-Resultado de instalación/ejecución desde extracción limpia en paquete_limpio.json;
+Se comunicó el resultado de instalación/ejecución desde extracción limpia en `paquete_limpio.json` (ausente del `main` revisado);
 el manifiesto interno SHA-256 permite verificar el contenido distribuido.
 
 La primera extracción detectó dos fallos de tests por codificación heredada entre procesos en Windows (padre UTF-8 e hijo con codificación local). Se fija `-X utf8` y `encoding="utf-8"` en los tests de consola y se repite la verificación en extracción nueva. No era fallo de movimientos ni se eliminaron tests.
