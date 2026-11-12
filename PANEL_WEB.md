@@ -1,5 +1,11 @@
 # Panel HTML local de VOICE-BITTLE
 
+> **Estado de esta versión de `main`: incompleta.** Falta `web/index.html`,
+> archivo que `bittle_web.py` necesita para servir la página. La petición a la
+> página devuelve error 500; las instrucciones siguientes describen el diseño
+> y solo son reproducibles después de recuperar el archivo correspondiente.
+> No se ha comprobado aquí la recuperación ni el funcionamiento físico.
+
 Desde la carpeta del proyecto, ejecuta `INICIAR_PANEL.bat` con doble clic o:
 
 ```powershell
@@ -60,7 +66,9 @@ Las pruebas del panel usan simulación y sustitutos de micrófono/robot. La
 validación física y con voz real de esta interfaz queda pendiente del usuario;
 no se deduce de sus pruebas de la consola anterior.
 
-Verificación del 2026-11-12: 149 pruebas automatizadas superadas, incluidas
+Verificación histórica comunicada el 2026-11-12 en otra copia, anterior a la
+comprobación de que falta `web/index.html` en este checkout: 149 pruebas
+automatizadas superadas, incluidas
 9 del panel (HTTP local, protección de acciones, conexión fallida, cola,
 desconexión, errores de micrófono y descarte de resultados tras desactivar).
 Revisión en navegador: carga, enumeración de dispositivos, conexión simulada,

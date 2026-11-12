@@ -2,9 +2,10 @@
 
 ## Panel web local
 
-Abre **INICIAR_PANEL.bat** para conectar desde una interfaz HTML, ver las
-órdenes, activar/desactivar la escucha y consultar la cola. Inicia desconectado
-y con el micrófono apagado. Instrucciones: [PANEL_WEB.md](PANEL_WEB.md).
+**Panel pendiente de recuperación:** `bittle_web.py` necesita `web/index.html`,
+que falta en la versión actual de `main`. Por ello, abrir `INICIAR_PANEL.bat`
+no permite usar la interfaz hasta recuperar ese archivo. Las pruebas históricas
+del panel corresponden a otra copia; detalles en [PANEL_WEB.md](PANEL_WEB.md).
 
 ## 🎤 Control por voz del robot real: `bittle_voz.py`
 
@@ -18,12 +19,15 @@ de secuencias por voz están pendientes de validación.
 **Secuencias:** di «siéntate y después ponte de pie» o añade órdenes mientras
 ejecuta otra. Consulta [uso y límites de la cola](SECUENCIAS.md).
 Los PDF y la presentación existentes son anteriores a esta actualización.
+El puente opcional de Issues para secuencias de ChatGPT tiene un vocabulario y
+un flujo independientes: [guía del puente](docs/CHATGPT_SECUENCIAS_SIUU.md).
 
 | Material | Archivo |
 |---|---|
 | Programa | [bittle_voz.py](bittle_voz.py) |
 | Guía paso a paso para principiantes (VS Code) | [GUIA_PASO_A_PASO.md](GUIA_PASO_A_PASO.md) · [PDF](GUIA_PASO_A_PASO.pdf) |
 | Presentación de clase | [Presentacion_Bittle_por_voz.pptx](Presentacion_Bittle_por_voz.pptx) · [PDF](Presentacion_Bittle_por_voz.pdf) |
+| Implementación, acciones y ejemplos de prompts | [Guía de implementación](docs/GUIA_IMPLEMENTACION_Y_PROMPTS.md) |
 
 ### Inicio rápido (PowerShell, desde esta carpeta)
 

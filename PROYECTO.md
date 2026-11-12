@@ -9,7 +9,10 @@ Una única entrega: requisitos → diseño → implementación → pruebas y evi
 | H3 | src/, voice_bittle.py, tests/, tools/, docs/H3/ | Casos TEST-01…37, resultados y manifiesto de código en evidencias/ |
 | H4 pendiente | docs/H3/preprueba_fisica.md y TEST-F01…F10 | Voz real, Bluetooth, posturas, seguridad y aceptación no acreditadas |
 
-GUIA.md es la única guía de instalación y uso. README.md da el inicio rápido.
+Para la consola histórica H3, [GUIA.md](GUIA.md) explica instalación y uso.
+[README.md](README.md) distingue esa consola de `bittle_voz.py`; para este
+último, consulta [GUIA_PASO_A_PASO.md](GUIA_PASO_A_PASO.md),
+[SECUENCIAS.md](SECUENCIAS.md) y la situación del panel en [PANEL_WEB.md](PANEL_WEB.md).
 ENTREGA_COMPANEROS.md resume esta revisión. El informe de desarrollo conserva el
 historial: sus recuentos anteriores están fechados y no sustituyen los resultados
 actuales generados. docs/historico conserva originales sin modificar y no es normativo.

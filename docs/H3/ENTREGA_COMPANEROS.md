@@ -1,8 +1,12 @@
 # Entrega integral VOICE-BITTLE — ARGOS
 
-Un único proyecto: H1 original, H2 vigente, software y verificación H3. Índice:
-[PROYECTO.md](../../PROYECTO.md). Guía única: [GUIA.md](../../GUIA.md).
-No se distribuyen tres entregas independientes ni versiones contradictorias activas.
+Este documento describe la entrega histórica H1/H2/H3 y su consola
+`voice_bittle.py`: [PROYECTO.md](../../PROYECTO.md) y [GUIA.md](../../GUIA.md).
+La aplicación posterior `bittle_voz.py` y sus capacidades físicas, secuencias y
+panel tienen un alcance distinto: consulta [README.md](../../README.md),
+[GUIA_PASO_A_PASO.md](../../GUIA_PASO_A_PASO.md) y
+[PANEL_WEB.md](../../PANEL_WEB.md). Los resultados siguientes son de la revisión
+H3 y no acreditan esas incorporaciones posteriores.
 
 ## Funcionalidades
 
@@ -22,7 +26,7 @@ Puerto pyserial preparado y probado con dobles; consola física bloqueada.
   Causa no determinada: falta audio del incidente; no se declara corregida su causa.
 - No se ensayó voz humana en esta revisión. Modelo inglés, precisión, condiciones
   acústicas, funcionamiento real sin Internet y rendimiento siguen pendientes.
-- Verificación de extracción/instalación del paquete: evidencias/paquete_limpio.json.
+- En la revisión histórica se registró la extracción/instalación en `evidencias/paquete_limpio.json`; ese archivo no está presente en el `main` revisado.
 
 ## Medidas conservadoras y límites
 

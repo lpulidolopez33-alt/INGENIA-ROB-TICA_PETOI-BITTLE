@@ -3,6 +3,8 @@
 Actualización de `bittle_voz.py`, por texto y voz. No cambia la aplicación
 histórica `voice_bittle.py` ni aprueba decisiones H1/H2/H3 pendientes.
 Reinicia el programa para cargarla; no necesita dependencias nuevas.
+Para el recorrido de implementación, ejemplos de prompts y acciones, consulta
+[la guía de implementación](docs/GUIA_IMPLEMENTACION_Y_PROMPTS.md).
 
 ## Uso
 
@@ -46,10 +48,12 @@ detectar negaciones o ruido del audio original.
 
 ## Verificación
 
-140 pruebas pasan, incluidas 16 nuevas en `tests/unit/test_cola_bittle_voz.py`:
+En una verificación histórica se comunicaron 140 pruebas aprobadas, incluidas
+16 nuevas en `tests/unit/test_cola_bittle_voz.py`:
 interpretación de dos/cuatro acciones, alias, repeticiones, frases inválidas,
 prioridad de parada, FIFO entre frases, coreografía completa/cancelada,
-movimiento temporizado, error, límite y cierre. Sin hardware ni micrófono.
+movimiento temporizado, error, límite y cierre. Fue una prueba sin hardware ni
+micrófono y no acredita por sí sola el estado del checkout actual.
 
 Pendiente: reconocimiento real de frases encadenadas y validación física de
 tiempos, habilidades y parada. La confirmación del usuario de voz/texto de la

@@ -2,12 +2,14 @@
 
 Esta guía explica cómo poner en marcha **a mano** el programa `bittle_voz.py` en un PC con **Windows**, usando **VS Code**.
 No hace falta saber programar. Solo tienes que seguir los pasos en orden y copiar los comandos tal cual.
+Las salidas de terminal mostradas son ejemplos y pueden diferir de la versión con cola.
+Consulta [SECUENCIAS.md](SECUENCIAS.md) para los tiempos y límites actuales.
 
 ---
 
 ## ¿Qué hace el programa?
 
-Tú hablas y Bittle obedece. Por dentro pasa esto:
+El programa intenta reconocer tus órdenes y enviarlas a Bittle. El reconocimiento, el enlace y la ejecución física pueden fallar. Por dentro pasa esto:
 
 ```
 micrófono  →  Vosk (entiende tu voz)  →  comando  →  Bluetooth  →  Bittle
@@ -17,7 +19,7 @@ micrófono  →  Vosk (entiende tu voz)  →  comando  →  Bluetooth  →  Bitt
 2. **Vosk** convierte tu voz en texto. Funciona **sin Internet**.
 3. El programa busca en ese texto una orden conocida (por ejemplo, «siéntate»).
 4. Envía la orden a Bittle por **Bluetooth**.
-5. **Bittle** hace el movimiento.
+5. Bittle puede ejecutar el movimiento si recibe la orden y su firmware la admite; comprueba el resultado observándolo.
 
 ---
 
@@ -26,7 +28,7 @@ micrófono  →  Vosk (entiende tu voz)  →  comando  →  Bluetooth  →  Bitt
 - [ ] Un PC con **Windows 10 u 11**, con micrófono (el del portátil sirve) y **Bluetooth**.
 - [ ] **Python 3.12 o más nuevo** (en el PC de pruebas se usó Python 3.14).
 - [ ] **VS Code** (Visual Studio Code) con la extensión **Python**.
-- [ ] La carpeta **`VOICE-BITTLE`**, que contiene el archivo `bittle_voz.py`.
+- [ ] La carpeta raíz del proyecto, que contiene `bittle_voz.py` (puede tener otro nombre, por ejemplo `INGENIA-ROB-TICA_PETOI-BITTLE`).
 - [ ] El **modelo de voz en español** de Vosk (unos 39 MB, lo descargamos en el paso 7).
 - [ ] El robot **Bittle** con la **batería cargada**.
 - [ ] Conexión a Internet **solo para instalar** (después ya no hace falta).
@@ -61,12 +63,12 @@ Deberías ver que la extensión «Python» aparece como instalada.
 ## Paso 3. Abrir la carpeta del proyecto en VS Code
 
 1. En VS Code, ve al menú **File > Open Folder…** (en español: **Archivo > Abrir carpeta…**).
-2. Elige la carpeta **`VOICE-BITTLE`** (la que tiene dentro `bittle_voz.py`).
+2. Elige la carpeta raíz que contiene directamente `bittle_voz.py`.
 3. Si VS Code pregunta si confías en los autores, pulsa **«Yes, I trust the authors»**.
 
 Deberías ver a la izquierda la lista de archivos, entre ellos **`bittle_voz.py`**.
 
-> Ojo: abre la carpeta `VOICE-BITTLE`, no la carpeta de arriba (`VOICE-BITTLE-ARGOS`).
+> El nombre de la carpeta depende de cómo hayas descargado el proyecto. Lo importante es que contenga directamente `bittle_voz.py`.
 
 ---
 
@@ -83,7 +85,7 @@ Deberías ver una línea parecida a esta (es PowerShell):
 PS C:\...\VOICE-BITTLE>
 ```
 
-Lo importante es que **termine en `VOICE-BITTLE>`**. Eso significa que estás en la carpeta correcta.
+El nombre que aparece es un ejemplo. Comprueba que estás en la raíz que contiene `bittle_voz.py`, por ejemplo con `dir bittle_voz.py`.
 
 Para comprobar que Python funciona, escribe esto y pulsa **Enter**:
 
@@ -135,7 +137,7 @@ Deberías ver cómo se descargan paquetes y al final una línea que empieza por 
 
 1. Descarga este archivo (unos 39 MB):
    <https://alphacephei.com/vosk/models/vosk-model-small-es-0.42.zip>
-2. Dentro de `VOICE-BITTLE`, crea una carpeta llamada **`modelos`** (si no existe ya).
+2. Dentro de la raíz del proyecto, crea una carpeta llamada **`modelos`** (si no existe ya).
 3. Descomprime el zip **dentro de `modelos`**.
 
 Al final la estructura tiene que quedar **exactamente así**:
@@ -314,7 +316,7 @@ Conectando a COM7 a 115200 baudios...
 Conectado. Bittle listo.
 ```
 
-Al abrir el puerto, **la placa de Bittle se reinicia** (puede pitar o moverse un poco). El programa espera hasta que Bittle dice «Ready!» (máximo 10 segundos). Si en lugar de «Bittle listo» pone «Conectado (sin confirmación de arranque)», normalmente funciona igual.
+Al abrir el puerto, **la placa de Bittle se reinicia** (puede pitar o moverse un poco). El programa espera hasta que Bittle dice «Ready!» (máximo 10 segundos). Si pone «Conectado (sin confirmación de arranque)», la apertura no confirma que el robot esté listo ni que haya recibido órdenes.
 
 **Si tu Bittle es Bluetooth LE:**
 
@@ -338,7 +340,7 @@ Si hay varios robots en clase, indica parte del nombre del tuyo:
 
 Después verás `🎤 Escuchando...`. Di **«de pie»** y luego **«saluda»**. 🎉
 
-**Para terminar:** pulsa **`Ctrl+C`**. El programa deja a Bittle **en reposo** (`krest`) antes de cerrarse.
+**Para terminar:** pulsa **`Ctrl+C`**. El programa cancela lo pendiente e intenta enviar `krest` antes de cerrar; comprueba la postura físicamente.
 
 ---
 
@@ -359,14 +361,18 @@ la cancelación y las pruebas pendientes. El PDF es anterior a este cambio.
 | **izquierda** | Gira a la izquierda | `kwkL` |
 | **derecha** | Gira a la derecha | `kwkR` |
 | **saluda**, hola | Saluda con la pata | `khi` |
-| **flexiones** | Hace flexiones | `kpu` |
-| **estira** (no «estírate») | Se estira | `kstr` |
+| **flexiones** | Solicita la habilidad de flexiones | `kpu` |
+| **estira**, estírate | Se estira | `kstr` |
 | **descansa**, duerme | Se tumba con los motores relajados | `krest` |
-| **baila**, baile, bailar | Baile casero de unos 24 segundos | `BAILE` |
-| **cristiano**, ronaldo, siu | Celebración «SIUUU»: se levanta sobre las patas traseras, pone las delanteras en X y el PC grita «SIUUU» | `CRISTIANO` |
-| **para**, quieto, alto | **Se para** (postura de equilibrio). **Siempre tiene prioridad** y corta cualquier baile | `kbalance` |
+| **baila**, baile, bailar | Solicita una coreografía casera de pasos y esperas programadas | `BAILE` (se descompone en varias órdenes) |
+| **cristiano**, ronaldo, siu | Solicita una coreografía casera de giro y posturas, con voz del PC si está disponible; comportamiento físico pendiente de comprobar | `CRISTIANO` (se descompone en varias órdenes) |
+| **para**, quieto, alto, stop | Cancela las acciones pendientes y solicita equilibrio; depende del reconocimiento y el enlace | `kbalance` |
 
-> ¿Por qué «estira» y no «estírate»? Porque «estírate» no está en el vocabulario del modelo de voz y no lo reconocería. (En el modo `--texto` sí funciona escribirlo.)
+La tabla identifica la intención y los tokens solicitados; no confirma que el
+robot los haya recibido ni que haya completado el movimiento. La cola espera
+tiempos estimados, no una señal de finalización física.
+
+> «Estira» y «estírate» están contempladas en el programa y su gramática; que el modelo las reconozca en una sesión real sigue dependiendo del audio y del entorno.
 
 ---
 
@@ -403,7 +409,8 @@ Guarda (`Ctrl+S`) y prueba primero en simulado:
 .\.venv\Scripts\python.exe bittle_voz.py --simulado --texto
 ```
 
-Escribe `gira`. Deberías ver `-> dar una vuelta (casero) (GIRO)` y `[SIMULADO] se enviaría: 'kvtL'`.
+Escribe `gira` y comprueba que el modo simulado identifica la acción y muestra
+los tokens de la secuencia. Las esperas y salidas pueden aparecer de forma asíncrona.
 
 **¿Existe mi palabra en el modelo?** Si una palabra no está en el vocabulario, Vosk nunca la reconocerá por voz. Para comprobarlo:
 
@@ -426,11 +433,11 @@ Otras habilidades de Bittle que puedes usar en tus secuencias (sacadas del propi
 | `No puedo abrir COM7: could not open port 'COM7'`, mensajes sobre **semáforo** o «**Se ha quitado el dispositivo**» | Bittle apagado, batería baja, demasiado lejos, o el puerto lo usa otro programa | Carga la batería, acércalo, cierra la app Petoi y otras terminales. Si sigue, quita Bittle en Bluetooth y vuelve a emparejarlo (paso 10) y comprueba el puerto (paso 11). |
 | `Se perdió la conexión con Bittle. Reconectando...` | Se cortó el Bluetooth | El programa reintenta solo. Si se repite, **carga la batería**. |
 | `No encuentro a Bittle. Dispositivos BLE vistos: ...` | Con `--ble` no lo encuentra | Comprueba que está encendido y que la app del móvil está cerrada. Usa `--nombre-ble` con parte del nombre que salga en la lista. |
-| `Bittle: ?0` | Bittle no entendió una orden concreta | Normalmente no pasa nada; repite la orden. Si ocurre con un comando casero, revisa cómo está escrita la orden. |
+| `Bittle: ?0` | Posible orden no reconocida por el firmware | Revisa la compatibilidad y el estado físico antes de decidir si repetirla. |
 | Hablo y no sale nada | El programa escucha otro micrófono, o hay mucho ruido | Usa `--listar`, elige otro con `--microfono N`, acércate y habla claro. |
 | `«...» -> no es una orden` | Ha oído algo que no está en la tabla | Usa exactamente las palabras de la tabla de órdenes. |
 | PowerShell dice que **no se permite ejecutar scripts** (al intentar activar el entorno) | Windows bloquea `Activate.ps1` | **No hace falta activar nada.** Llama directamente a `.\.venv\Scripts\python.exe` como en esta guía. |
-| La terminal no termina en `VOICE-BITTLE>` | Estás en otra carpeta | Repite el paso 3 (Abrir carpeta) y abre una terminal nueva. |
+| `dir bittle_voz.py` no encuentra el archivo | Estás en otra carpeta | Repite el paso 3 (Abrir carpeta) y abre una terminal nueva. |
 
 ---
 
@@ -438,9 +445,10 @@ Otras habilidades de Bittle que puedes usar en tus secuencias (sacadas del propi
 
 - **Prueba siempre primero con `--simulado`.** Solo muestra lo que enviaría; Bittle no se mueve.
 - Deja **espacio libre** alrededor del robot y nunca lo pongas en el borde de una mesa.
-- Di **«para»** (o «quieto», «alto») para detenerlo en cualquier momento. Esta orden **siempre gana** a las demás.
+- Supervisa presencialmente y mantén accesible el interruptor físico; ensaya las habilidades y los tiempos del firmware antes de encadenarlas.
+- Di **«para»** (o «quieto», «alto», «stop») para cancelar la cola y solicitar equilibrio. Tiene prioridad en el análisis de la frase, pero no garantiza una parada física; una escritura en curso debe terminar.
 - **Carga la batería** antes de la celebración de Cristiano: ponerse de pie sobre dos patas gasta mucho y con batería baja puede caerse.
-- Para salir, **`Ctrl+C`**: Bittle se queda en reposo.
+- Para salir, **`Ctrl+C`** cancela las acciones pendientes e intenta solicitar reposo. Comprueba el estado físico.
 
 ---
 
