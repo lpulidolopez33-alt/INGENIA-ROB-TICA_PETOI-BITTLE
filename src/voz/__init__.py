@@ -21,6 +21,10 @@ class Resultado:
     confianza: float
     inicio: datetime
     fin: datetime
+    fin_monotonic: float | None = None
+    origen_tiempo: str = "simulado"
+    captura_id: str | None = None
+    emitido_monotonic: float | None = None
 
 
 class Recognizer(Protocol):

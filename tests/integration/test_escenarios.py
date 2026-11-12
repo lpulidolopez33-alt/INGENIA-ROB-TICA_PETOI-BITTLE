@@ -278,6 +278,8 @@ def test_sc006_tras_reconexion_no_se_ejecuta_ninguna_orden_anterior(env_listo):
     escrito = list(e.serie.escrituras)
     e.serie.restablecer()
     assert e.ctrl.reconectar()
+    assert e.ctrl.gestor.estado is Estado.DESCONOCIDO
+    assert e.ctrl.confirmar_reposo("Confirmación explícita en simulación")
     assert e.ctrl.gestor.estado is Estado.REPOSO
     assert e.serie.escrituras == escrito                    # nada reenviado automáticamente
     assert mover(e, "ponte de pie").resultado == "enviada"  # solo con orden nueva

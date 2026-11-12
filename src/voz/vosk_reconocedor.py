@@ -1,57 +1,89 @@
-"""Adaptador Vosk (RD-02, RR-03). NO cubierto por las pruebas automáticas (necesita micrófono
-y modelos): se valida en T005/T010 y en el ensayo de integración (OPEN-03).
-
-Los modelos se cargan desde rutas LOCALES; nunca se descargan en ejecución (RR-03).
-Confianza de la orden = media de la confianza por palabra que devuelve Vosk con SetWords(True).
+"""Vosk local; confianza mínima por palabra experimental (OPEN-03/04).
+El fin acústico se estima con el último segmento de palabra sobre el reloj de
+captura. No es una medición calibrada ni evidencia de cumplimiento de RR-02.
 """
 import json
 import time
-from datetime import datetime
-
+from uuid import uuid4
+from datetime import datetime, timedelta
+from pathlib import Path
 from voz import MicrofonoNoDisponible, ModeloNoDisponible, Resultado
+from seguridad import numero_valido
 
 
 class VoskReconocedor:
-    def __init__(self, rutas_modelos: dict, frases_por_idioma: dict, sample_rate: int = 16000):
-        self.rutas = rutas_modelos              # {"es": "modelos/vosk-es", "en": "modelos/vosk-en"}
-        self.frases = frases_por_idioma         # {"es": ["siéntate", ...], ...} para la gramática
+    def __init__(self, rutas_modelos, frases_por_idioma, sample_rate=16000, dispositivo=None):
+        self.rutas = rutas_modelos
+        self.frases = frases_por_idioma
         self.sample_rate = sample_rate
+        self.dispositivo = dispositivo
         self._modelo = None
         self._idioma = None
 
-    def cargar_modelo(self, idioma: str) -> None:
+    def cargar_modelo(self, idioma):
         try:
             from vosk import Model
-            self._modelo = Model(self.rutas[idioma])
-        except Exception as e:  # modelo ausente o corrupto
-            raise ModeloNoDisponible(idioma) from e
-        self._idioma = idioma
+            if not Path(self.rutas[idioma]).is_dir():
+                raise FileNotFoundError(self.rutas[idioma])
+            modelo = Model(self.rutas[idioma])
+        except Exception as exc:
+            raise ModeloNoDisponible(idioma) from exc
+        self._modelo, self._idioma = modelo, idioma
 
-    def disponible(self) -> bool:
+    def disponible(self):
         try:
             import sounddevice as sd
-            return sd.query_devices(kind="input") is not None
+            return sd.query_devices(self.dispositivo, kind="input")["max_input_channels"] > 0
         except Exception:
             return False
 
-    def escuchar(self, timeout: float) -> Resultado | None:
-        import sounddevice as sd
-        from vosk import KaldiRecognizer
+    def escuchar(self, timeout):
+        if self._modelo is None:
+            raise ModeloNoDisponible("Cargar un modelo antes de escuchar")
         if not self.disponible():
             raise MicrofonoNoDisponible()
-        gramatica = json.dumps(self.frases[self._idioma] + ["[unk]"], ensure_ascii=False)
-        rec = KaldiRecognizer(self._modelo, self.sample_rate, gramatica)
-        rec.SetWords(True)
-        inicio = datetime.now()
-        limite = time.monotonic() + timeout
-        with sd.RawInputStream(samplerate=self.sample_rate, blocksize=4000,
-                               dtype="int16", channels=1) as flujo:
-            while time.monotonic() < limite:
-                datos, _ = flujo.read(4000)
-                if rec.AcceptWaveform(bytes(datos)):
-                    res = json.loads(rec.Result())
-                    palabras = res.get("result", [])
-                    if res.get("text") and palabras:
-                        conf = sum(p["conf"] for p in palabras) / len(palabras)
-                        return Resultado(res["text"], conf, inicio, datetime.now())
-        return None
+        try:
+            import sounddevice as sd
+            from vosk import KaldiRecognizer
+            # Decodificación abierta: no forzar ruido hacia un vocabulario de cuatro órdenes.
+            # La autorización sigue siendo estricta en Traductor.
+            rec = KaldiRecognizer(self._modelo, self.sample_rate)
+            captura_id = uuid4().hex
+            hay_senal = False
+            rec.SetWords(True)
+            with sd.RawInputStream(samplerate=self.sample_rate, blocksize=4000,
+                                   device=self.dispositivo, dtype="int16", channels=1) as flujo:
+                inicio = datetime.now()
+                inicio_mono = time.monotonic()
+                limite = inicio_mono + timeout
+                while time.monotonic() < limite:
+                    datos, overflow = flujo.read(4000)
+                    if overflow:
+                        raise MicrofonoNoDisponible("Desbordamiento de audio; captura descartada")
+                    datos = bytes(datos)
+                    hay_senal = hay_senal or any(datos)
+                    if rec.AcceptWaveform(datos):
+                        res = json.loads(rec.Result())
+                        if not hay_senal:
+                            return None
+                        texto, palabras = res.get("text", ""), res.get("result", [])
+                        if not isinstance(texto, str):
+                            raise ValueError("Texto Vosk inválido")
+                        if not texto:
+                            continue
+                        if not palabras or any(not numero_valido(p.get("conf")) for p in palabras):
+                            return Resultado(texto, None, inicio, datetime.now())
+                        if " ".join(p.get("word", "") for p in palabras).strip() != texto.strip():
+                            return Resultado(texto, None, inicio, datetime.now())
+                        conf = min(p["conf"] for p in palabras)
+                        fin = palabras[-1].get("end")
+                        transcurrido = time.monotonic() - inicio_mono
+                        if not numero_valido(fin, 0, transcurrido):
+                            return Resultado(texto, None, inicio, datetime.now())
+                        return Resultado(texto, conf, inicio, inicio + timedelta(seconds=fin),
+                                         inicio_mono + fin, "estimado_vosk", captura_id, time.monotonic())
+            return None
+        except MicrofonoNoDisponible:
+            raise
+        except Exception as exc:
+            raise MicrofonoNoDisponible("Fallo de captura o reconocimiento; no se conserva audio") from exc

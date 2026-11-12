@@ -21,4 +21,5 @@ def como_texto(vista: dict) -> str:
               f"Escucha: {'ACTIVA' if vista['escucha_activa'] else 'inactiva'}   "
               f"Movimiento: {vista['estado_movimiento']}", "Órdenes admitidas:"]
     lineas += [f"  «{o['frase']}» -> {o['accion']}" for o in vista["ordenes_admitidas"]]
+    lineas += [f"Aviso: {aviso}" for aviso in vista["avisos"]]
     return "\n".join(lineas)

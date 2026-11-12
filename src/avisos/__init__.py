@@ -6,6 +6,12 @@ from typing import Callable
 from reloj import Reloj
 
 MENSAJES = {
+    "captura_invalidada": "Captura caducada, repetida o invalidada. Inicia una nueva captura.",
+    "confianza_invalida": "Confianza inválida. Orden rechazada; repítela.",
+    "resultado_invalido": "Resultado de voz inválido. Orden rechazada; repítela.",
+    "accion_no_autorizada": "Acción no autorizada. No se envía ningún comando.",
+    "escucha_inactiva": "Escucha desactivada o modelo no disponible.",
+    "estado_desconocido": "Estado desconocido: confirma reposo antes de continuar.",
     "no_reconocida": "No he entendido la orden. Repítela, por favor.",
     "baja_confianza": "No he entendido la orden con claridad. Repítela, por favor.",
     "silencio": "No se ha recibido ninguna orden. Puedes intentarlo de nuevo.",

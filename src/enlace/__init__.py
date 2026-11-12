@@ -1,6 +1,7 @@
 """Enlace serie/Bluetooth con Bittle (D-04, RI-01, RI-02). El módulo BT se trata como puerto serie.
 Solo se transmiten tokens de la lista blanca (RS-01): nunca cargas arbitrarias."""
 from typing import Protocol
+from seguridad import TOKENS
 
 
 class LinkError(Exception):
@@ -17,6 +18,8 @@ class SerialPort(Protocol):
 
 class FakeSerial:
     """Sustituto del robot: registra escrituras e inyecta fallos. NO emula posturas del firmware."""
+
+    simulado = True
 
     def __init__(self):
         self.escrituras: list[bytes] = []
@@ -54,16 +57,32 @@ class FakeSerial:
 class EnlaceBittle:
     def __init__(self, puerto: SerialPort, tokens_permitidos, terminador: bytes = b""):
         self.puerto = puerto
-        self.tokens_permitidos = frozenset(tokens_permitidos)
-        self.terminador = terminador  # a confirmar con la documentación de Petoi (T004)
+        self.tokens_permitidos = frozenset(tokens_permitidos) & TOKENS
+        if terminador not in (b"", b"\n", b"\r", b"\r\n"):
+            raise ValueError("terminador no permitido")
+        self.terminador = terminador  # confirmar según hardware (OPEN-02/10/15)
 
     def conectar(self) -> None:
+        if not self.simulado:
+            from enlace.serie_real import PuertoSerieReal
+            if not isinstance(self.puerto, PuertoSerieReal):
+                raise LinkError("Transporte no autorizado: usar FakeSerial o PuertoSerieReal")
+            if self.terminador != self.puerto.perfil.terminador:
+                raise LinkError("Terminador distinto del perfil físico revisado")
         self.puerto.abrir()
+
+    @property
+    def simulado(self) -> bool:
+        return isinstance(self.puerto, FakeSerial)
 
     def activo(self) -> bool:
         return self.puerto.abierto
 
     def enviar(self, token: str) -> None:
+        if not self.simulado:
+            from enlace.serie_real import PuertoSerieReal
+            if not isinstance(self.puerto, PuertoSerieReal):
+                raise LinkError("Transporte físico no autorizado")
         if token not in self.tokens_permitidos:
             raise ValueError(f"token no permitido: {token!r}")
         if not self.activo():

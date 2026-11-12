@@ -1,6 +1,10 @@
 # Resultados de pruebas H3 (sin robot)
 
-Versión del software: commit `sin-commit` (+ cambios sin commitear si los hay) · 2026-11-10 11:24
+Commit base `e3c0ba25ebf6744c25f5f815b714427c64d02da5` · 2026-11-12T10:18:34.342710+00:00
+
+SHA-256 del conjunto de código/configuración/pruebas: `b1ee128ddaa79e9749c1b02b623bfca3eb54b4623cd29cec7cdb16e9c37b8f66`. Manifiesto y cambios locales en `ejecucion_H3.json`.
+
+Python 3.12.10, pytest 9.2.0; 124 pruebas; código de salida 0. Solo simulación/dobles/inspección. PASS no acredita un requisito completo.
 
 | Caso | Nivel | Requisitos | Escenarios | Pruebas | Veredicto |
 |---|---|---|---|---|---|
@@ -36,5 +40,10 @@ Versión del software: commit `sin-commit` (+ cambios sin commitear si los hay) 
 | TEST-30 | 2 | RF-04, RI-05, RS-01, RU-02 | ESC-11 | 1 | **PASS** |
 | TEST-31 | 2 | RFI-01, RM-02, RU-03 | ESC-12 | 1 | **PASS** |
 | TEST-32 | 2 | RM-01, RM-02 | ESC-02, ESC-08, ESC-09, ESC-10, ESC-11, ESC-12 | 1 | **PASS** |
+| TEST-33 | 2 | RFI-01, RS-01, RS-02 | ESC-08, ESC-10, ESC-12 | 18 | **PASS** |
+| TEST-34 | 3 | RD-02, RFI-01, RFI-02, RS-01 | ESC-01, ESC-08, ESC-12 | 27 | **PASS** |
+| TEST-35 | 2 | RF-10, RI-06, RS-01, RU-03 | ESC-03, ESC-05 | 4 | **PASS** |
+| TEST-36 | 1 | RD-01 |  | 4 | **PASS** |
+| TEST-37 | 2 | RF-04, RF-10, RS-01 | ESC-09, ESC-10, ESC-11 | 15 | **PASS** |
 
-**32/32 casos PASS.**
+**37/37 casos PASS.**

@@ -1,0 +1,44 @@
+[
+  {
+    "caso": "demo_es",
+    "argumentos": [
+      "--demo"
+    ],
+    "exit_code": 0,
+    "stdout": "VOICE-BITTLE | SIMULACIÓN: ningún robot conectado | Proveedor: fake\n/activar /desactivar /capturar /idioma es|en /estado /historial\n/fin (solo simulación) /desconectar /reconectar /reposo (solo simulación)\n/salir /ayuda. En modo fake escribe una frase; no es reconocimiento de audio.\nLas consultas de voz requieren /activar. /capturar toma una locución con Vosk.\n> /activar\nEscucha activada: True\n> siéntate\nResultado: enviada; motivo: -\nTexto reconocido/simulado: siéntate\n> estado\nResultado: aceptada; motivo: -\nTexto reconocido/simulado: estado\n{\"enlace_activo\": true, \"estado_movimiento\": \"en_curso\"}\n> historial\nResultado: aceptada; motivo: -\nTexto reconocido/simulado: historial\n[{\"fecha\": \"2026-11-10\", \"hora\": \"10:00:01.000\", \"texto\": \"siéntate\", \"intencion\": \"sentarse\", \"confianza\": 0.95, \"resultado\": \"enviada\", \"motivo\": null, \"tipo_error\": null, \"token\": \"ksit\", \"latencia_envio\": 0.0, \"origen_tiempo\": \"simulado\"}, {\"fecha\": \"2026-11-10\", \"hora\": \"10:00:02.000\", \"texto\": \"estado\", \"intencion\": \"estado\", \"confianza\": 0.95, \"resultado\": \"aceptada\", \"motivo\": null, \"tipo_error\": null}]\n> corre\nResultado: rechazada; motivo: no_reconocida\nTexto reconocido/simulado: corre\nNo he entendido la orden. Repítela, por favor.\n> /fin\nFin SIMULADO; postura estimada\n> ponte de pie\nResultado: enviada; motivo: -\nTexto reconocido/simulado: ponte de pie\n> /fin\nFin SIMULADO; postura estimada\n> /salir\nEscrituras simuladas: [b'ksit', b'kup']\n",
+    "stderr": ""
+  },
+  {
+    "caso": "demo_en",
+    "argumentos": [
+      "--demo",
+      "--idioma",
+      "en"
+    ],
+    "exit_code": 0,
+    "stdout": "VOICE-BITTLE | SIMULACIÓN: ningún robot conectado | Proveedor: fake\n/activar /desactivar /capturar /idioma es|en /estado /historial\n/fin (solo simulación) /desconectar /reconectar /reposo (solo simulación)\n/salir /ayuda. En modo fake escribe una frase; no es reconocimiento de audio.\nLas consultas de voz requieren /activar. /capturar toma una locución con Vosk.\n> /activar\nEscucha activada: True\n> sit\nResultado: enviada; motivo: -\nTexto reconocido/simulado: sit\n> status\nResultado: aceptada; motivo: -\nTexto reconocido/simulado: status\n{\"enlace_activo\": true, \"estado_movimiento\": \"en_curso\"}\n> history\nResultado: aceptada; motivo: -\nTexto reconocido/simulado: history\n[{\"fecha\": \"2026-11-10\", \"hora\": \"10:00:01.000\", \"texto\": \"sit\", \"intencion\": \"sentarse\", \"confianza\": 0.95, \"resultado\": \"enviada\", \"motivo\": null, \"tipo_error\": null, \"token\": \"ksit\", \"latencia_envio\": 0.0, \"origen_tiempo\": \"simulado\"}, {\"fecha\": \"2026-11-10\", \"hora\": \"10:00:02.000\", \"texto\": \"status\", \"intencion\": \"estado\", \"confianza\": 0.95, \"resultado\": \"aceptada\", \"motivo\": null, \"tipo_error\": null}]\n> corre\nResultado: rechazada; motivo: no_reconocida\nTexto reconocido/simulado: corre\nNo he entendido la orden. Repítela, por favor.\n> /fin\nFin SIMULADO; postura estimada\n> stand up\nResultado: enviada; motivo: -\nTexto reconocido/simulado: stand up\n> /fin\nFin SIMULADO; postura estimada\n> /salir\nEscrituras simuladas: [b'ksit', b'kup']\n",
+    "stderr": ""
+  },
+  {
+    "caso": "modelo_ausente",
+    "argumentos": [
+      "--reconocedor",
+      "vosk",
+      "--modelo-es",
+      "modelos/NO_INSTALADO"
+    ],
+    "exit_code": 1,
+    "stdout": "VOICE-BITTLE | SIMULACIÓN: ningún robot conectado | Proveedor: vosk\nInicio incompleto: modelo o enlace no disponible; revisa las rutas locales.\n",
+    "stderr": ""
+  },
+  {
+    "caso": "fisico_bloqueado",
+    "argumentos": [
+      "--modo",
+      "fisico"
+    ],
+    "exit_code": 2,
+    "stdout": "MODO FÍSICO BLOQUEADO. No se abre ningún puerto. Pendientes: modelo, firmware, Bluetooth, protocolo, parámetros aprobados, intervención independiente y autorización de sesión. Ver docs/H3/preprueba_fisica.md.\n",
+    "stderr": ""
+  }
+]

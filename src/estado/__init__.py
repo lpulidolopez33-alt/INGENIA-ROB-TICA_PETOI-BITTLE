@@ -7,6 +7,7 @@ class Estado(Enum):
     DESCONECTADO = "desconectado"   # sin enlace: movimientos inhabilitados (RO-02, RS-02)
     REPOSO = "reposo"               # enlace activo, sin acción en curso
     EJECUTANDO = "ejecutando"       # acción enviada; nuevas órdenes de movimiento se rechazan
+    DESCONOCIDO = "desconocido"     # conexión no acredita inmovilidad
 
 
 class TransicionInvalida(Exception):
@@ -31,6 +32,8 @@ class Gestor:
             return False, "sin_enlace"
         if self.estado is Estado.EJECUTANDO:
             return False, "accion_en_curso"
+        if self.estado is Estado.DESCONOCIDO:
+            return False, "estado_desconocido"
         return True, None
 
     def iniciar_accion(self) -> None:

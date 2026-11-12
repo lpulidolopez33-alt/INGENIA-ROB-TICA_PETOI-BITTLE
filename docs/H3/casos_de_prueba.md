@@ -19,7 +19,7 @@ Sustitutos: `FakeRecognizer` (voz guionizada, latencias simuladas), `FakeSerial`
 - OPEN-11: las consultas («historial», «estado») se atienden también con un movimiento en curso, porque no generan comandos.
 - OPEN-14: sin evidencia observada del resultado físico, el estado de movimiento al terminar una acción es «estimado» (nunca «finalizado»). El fin de acción lo comunica el operador/supervisor (`finalizar_accion`).
 - La escucha es un indicador independiente del estado de movimiento (desviación de D-08), porque ESC-07 exige recibir órdenes mientras Bittle ejecuta una.
-- El terminador del comando serie es configurable (`EnlaceBittle(terminador=...)`, por defecto vacío): confirmar con la documentación de Petoi en T004.
+- El terminador del comando serie es configurable (`EnlaceBittle(terminador=...)`, por defecto vacío): confirmar con la documentación de Petoi en T037 histórico (OPEN-02/10/15).
 
 ## 2. Casos automatizados (sin robot)
 
@@ -53,14 +53,14 @@ Todos en `tests/`; el identificador figura como `@pytest.mark.caso("TEST-xx")`.
 | TEST-24 | RF-05, RF-06, RF-09, RI-07 | 07 | 2 | `kup` en curso | «siéntate» | Rechazada, no encolada, aviso; tras el fin de acción no se ejecuta | escenarios |
 | TEST-25 | RS-02, RFI-02, RM-02, RI-03, RO-02 | 08 | 2 | Orden en curso | Desconectar el puerto; vigilar cada 0,5 s | Detectada ≤ T_enlace; movimientos bloqueados; «desconocido»; error con fecha/hora/tipo; sin reintento | escenarios |
 | TEST-26 | RS-02, RFI-02, RM-02 | 08 | 2 | Sesión activa | Error de escritura al enviar | Estado desconectado, 0 escrituras, aviso y registro | escenarios |
-| TEST-27 | RS-02, RF-05 | 08 | 2 | Pérdida de enlace con orden rechazada | Restablecer y reconectar | Nada se reenvía; solo una orden nueva se ejecuta (SC-006) | escenarios |
+| TEST-27 | RS-02, RF-05 | 08 | 2 | Pérdida de enlace con orden rechazada | Restablecer y reconectar; comprobar bloqueo desconocido y confirmar reposo simulado | Nada se reenvía; solo una orden nueva se ejecuta (SC-006) | escenarios |
 | TEST-28 | RF-04, RF-06, RS-01, RU-02, RM-01 | 09 | 2 | Escucha activa | Cuatro entradas no reconocidas | 0 escrituras; aviso en ≤ T_aviso que pide repetir; evento `rechazada` | escenarios |
 | TEST-29 | RF-04, RS-01, RR-01 | 10 | 2 | Escucha activa | «siéntate» con confianza 0,55 | Rechazada `baja_confianza`, 0 escrituras, aviso ≤ T_aviso | escenarios |
 | TEST-30 | RF-04, RS-01, RI-05, RU-02 | 11 | 2 | Escucha activa | Silencio | Captura cerrada tras T_escucha; sin movimiento; aviso; nuevo intento posible | escenarios |
 | TEST-31 | RFI-01, RM-02, RU-03 | 12 | 2 | Escucha activa | Micrófono desconectado, luego recuperado | Escucha off, aviso, error registrado; se reactiva manualmente | escenarios |
 | TEST-32 | RM-01, RM-02 | 02, 08–12 | 2 | Sesión activa | Mezcla de 6 entradas (válidas, inválidas, baja confianza, silencio) | 100 % en el registro con fecha, hora y resultado (SC-007) | escenarios |
 
-**Limitaciones declaradas:** TEST-10 es una inspección de código (no demuestra funcionamiento sin Internet; eso se prueba en T005). TEST-16 usa latencias simuladas. RR-01 (≥ 90 % de reconocimiento) **no** puede verificarse sin audio real.
+**Limitaciones declaradas:** TEST-10 es una inspección de código (no demuestra funcionamiento sin Internet; eso se reserva a T043 histórico / TEST-F10). TEST-16 usa latencias simuladas. RR-01 (≥ 90 % de reconocimiento) **no** puede verificarse sin audio real.
 
 ## 3. Casos físicos y de integración (H4) — a ejecutar con supervisión
 
@@ -82,3 +82,32 @@ Requieren autorización del profesor (movimientos), superficie estable y supervi
 ## 4. Gestión de cambios (CR-01)
 
 Cuando se conozca CR-01: (1) comprender el cambio; (2) marcar los ESC, requisitos, tareas y pruebas afectados en `evidencias/trazabilidad_H3.md`; (3) actualizar H1/spec/plan/tasks; (4) implementar; (5) volver a ejecutar `python tools/generar_evidencias.py` como prueba de regresión y añadir los casos nuevos.
+
+## 5. Regresiones de esta revisión H3 (2026-11-12)
+
+Se conservan TEST-01…32. TEST-27 añade confirmación manual de reposo tras
+reconexión: el comportamiento anterior de dar reposo por conectar era inseguro.
+No se elimina ninguna prueba para ocultar un fallo.
+
+| Caso | Método / archivo | Precondición y entradas | Resultado esperado | Alcance |
+|---|---|---|---|---|
+| TEST-33 | Simulación, test_seguridad.py | FakeSerial; confianzas inválidas, resultado mal formado, fallo de modelo, escucha desactivada, JSON alterado, desconexión durante acción | Rechazo controlado, cero nuevas escrituras; reconexión bloqueada hasta reposo explícito | RS-01/02, RFI-01 parciales; ESC-08/10/12 |
+| TEST-34 | Dobles de Vosk/audio/serial, test_adaptadores.py | Sin dispositivos; perfiles incompletos, falta de autorización, fallo de apertura/escritura parcial, overflow/lectura, modelos ausentes, ocho frases ES/EN | Puerto sin habilitar nunca abre; lista estricta; errores controlados; consultas no escriben; confianza/fin estimados | RD-02, RFI-01/02, RS-01 parciales; NO Vosk ni Bluetooth reales |
+| TEST-35 | Proceso consola + simulación, test_consola.py | Demo ES/EN, controles manuales y --modo fisico | Demo devuelve 0 con solo ksit/kup simulados; físico devuelve 2 sin crear registro ni abrir puerto | RF-10, RU-03, RI-06, RS-01 parciales |
+| TEST-36 | Unitarias, test_evidencias.py | Reportes de setup/call/teardown y skips | Nunca PASS si hay fallo de teardown, omisión o ejecución incompleta | Integridad de evidencias; no acredita operación del robot |
+
+Los resultados observados se generan en evidencias/resultados_H3.md. Cada caso
+puede contener varias pruebas parametrizadas. Nuevas marcas son cobertura de
+regresión asociada, no una modificación de la matriz H1 ni prueba de cumplimiento completo.
+La latencia real queda pendiente: los tests del reloj no validan micrófono, buffers,
+radio ni recepción del controlador. Los TEST-F01…F10 continúan sin ejecutar.
+
+## 6. Revisión de capturas (entrega integral)
+
+TEST-37: tests/unit/test_revision_voz.py; RS-01, RF-04, RF-10; ESC-09/10/11.
+Método: PCM sintético y mocks. Comprueba silencio digital con resultado inesperado,
+ruido con texto ajeno, parciales descartados, reconocedor nuevo, confianza mínima
+por palabra, caducidad/repetición y desactivación durante captura. Cero escrituras
+para casos rechazados. No demuestra rechazo universal de ruido real.
+Ensayo separado `tools/ensayo_audio_sintetico.py`: Vosk ES real, sin micrófono,
+con silencio/ruido/tono; evidencia en audio_sintetico.json, fuera de la suite pytest.

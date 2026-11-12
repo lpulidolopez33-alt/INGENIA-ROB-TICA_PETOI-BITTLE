@@ -1,3 +1,34 @@
+# Seguimiento vigente H3 — 2026-11-12
+
+Los T001–T050 del anexo conservan su identidad original. No se adopta la
+renumeración T001–T042 de la rama remota specs-h1-v02. El checkout H3 antiguo
+con T001/T002 completados no está disponible: no se afirma haberlo recuperado.
+
+| Trabajo actual | Estado | Relación histórica / evidencia |
+|---|---|---|
+| H3-A01 Validar resultados, confianza y acciones | Implementado y probado con dobles | T014/T019/T020/T024; TEST-33 |
+| H3-A02 Modelo/escucha, reconexión y reposo desconocido | Implementado y probado con dobles | T023/T025/T028/T029/T050; TEST-33 |
+| H3-A03 Adaptadores Vosk y serie bloqueada | Implementados, validación real pendiente | T011/T012/T026/T037/T043; TEST-34 |
+| H3-A04 Consola ES/EN y demo | Implementada y probada | T032/T033/T035; TEST-35 |
+| H3-A05 Evidencias con alcance y huella | Implementado y probado | T046; TEST-36 |
+| H3-A06 Reconciliar documentos con H1 v0.2 | Actualizados; revisión de equipo pendiente | T003/T009/T010/T044/T045 |
+| H4-01 Identificar modelo/firmware/Bluetooth/protocolo | Bloqueado por información física | T037, OPEN-02/10/15 |
+| H4-02 Aprobar seguridad y parámetros | Pendiente de responsables | T006/T038, OPEN-04/09/12/14 |
+| H4-03 Ensayos reales de voz, offline y rendimiento | No ejecutados | T042/T043/T049/T041 |
+| H4-04 Movimiento, cierre e intervención independiente | No ejecutados | T039/T040; TEST-F01…F10 |
+
+T001: inventario actual en environment-decision.md; no equivale al archivo local perdido.
+T002: registro actual en decision-log.md, sin inventar aprobaciones.
+T047: entorno virtual local creado; instalación e importación verificadas.
+Los T restantes no se marcan globalmente completos: pueden mezclar software hecho
+con aprobación o verificación física pendiente. Las rutas antiguas `src/voice_bittle`
+no deben recrearse; plan.md identifica los componentes existentes.
+
+## Anexo histórico: plan anterior, conservado para trazabilidad
+
+NO es una lista de ejecución vigente. Su terminología ESC/NEC/OPEN y rutas proceden
+del H1 v0.1; usar spec.md y la tabla anterior para trabajo actual.
+
 # Tasks: VOICE-BITTLE Voice-Control System
 
 **Input**: Design documents in `specs/001-voice-bittle-spec/`

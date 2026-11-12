@@ -1,91 +1,192 @@
-# Guía: cómo funciona el repositorio y cómo actualizarlo
+# Guía práctica VOICE-BITTLE (Windows / PowerShell)
 
-## 1. La idea en una frase
-El robot solo se mueve si una orden de voz **pasa por una cadena de filtros**; cada filtro es un módulo pequeño y se prueba por separado, sin robot ni micrófono.
+## 1. Qué se ha integrado
 
-```
-voz ──► traductor ──► controlador ──► estado ──► enlace ──► Bittle
-        (¿es una       (orquesta,     (¿puede     (solo       (ksit / kup)
-        orden y con    avisa y        moverse     tokens de
-        confianza?)    registra)      ahora?)     la lista)
-                           │
-                    avisos + registro + interfaz
-```
+Se reutilizan el controlador, vocabulario, traductor, estados, avisos, registro e
+interfaces existentes. `voice_bittle.py` inicia una consola. `FakeRecognizer`
+simula texto/confianza; `VoskReconocedor` usa modelos locales y micrófono.
+Ambos alimentan el mismo controlador. `FakeSerial` registra bytes sin hardware.
+`PuertoSerieReal` prepara el transporte pyserial para H4, bloqueado sin perfil y
+habilitación; la consola no ofrece aún habilitación física.
 
-## 2. Qué hace cada carpeta
+Flujo: voz → traductor → controlador/estado → enlace. Consultas → vista/registro,
+sin pasar por envío. `seguridad.py` fija la política de dos acciones. Los errores,
+la confianza inválida, escucha desactivada, modelo ausente o estado desconocido
+impiden nuevas escrituras motrices. Los avisos actuales son visuales; TTS pendiente.
 
-| Carpeta | Qué hace | Cuándo la tocas |
-|---|---|---|
-| `src/vocabulario/vocabulario.json` | Las órdenes: frase en ES/EN, tipo (movimiento/consulta) y token | Añadir o cambiar una orden |
-| `src/voz/` | Convierte audio en texto + confianza. `FakeRecognizer` para pruebas, `vosk_reconocedor.py` para el real | Cambiar de motor de voz |
-| `src/traductor/` | Decide si el texto es una orden válida (idioma, vocabulario, umbral U) | Cambiar reglas de validación |
-| `src/estado/` | Máquina de estados: DESCONECTADO, REPOSO, EJECUTANDO | Cambiar cuándo se permite mover |
-| `src/enlace/` | Envía el token por serie/Bluetooth. `FakeSerial` para pruebas | Conectar el robot real |
-| `src/registro/` | Guarda cada evento (fecha, hora, texto, resultado) en JSON Lines | Añadir campos al registro |
-| `src/avisos/` | Mensajes al usuario (pantalla y voz) | Cambiar textos |
-| `src/interfaz/` | Datos que muestra la pantalla (enlace, idioma, escucha, órdenes) | Cambiar lo que se ve |
-| `src/app/controlador.py` | El «director»: implementa los escenarios ESC-01…ESC-12 | Cambiar el comportamiento de un escenario |
-| `src/config.py` | Valores U, T_aviso, T_enlace, T_escucha, 3 s | Ajustar números tras los ensayos |
-| `tests/` | Las pruebas (cada una lleva TEST-xx, requisitos y escenarios) | Siempre que cambies algo |
-| `docs/H3/casos_de_prueba.md` | Lista de casos, automáticos y físicos | Al añadir pruebas |
-| `evidencias/` | Resultados y trazabilidad **generados** (no se editan a mano) | Se regeneran |
+## 2. Instalación reproducible
 
-## 3. Qué pasa cuando dices «siéntate»
-1. `voz` devuelve texto «siéntate» y confianza 0,95.
-2. `traductor`: ¿está en el vocabulario del idioma activo? ¿confianza ≥ U? → orden válida.
-3. `controlador`: es un movimiento, así que pregunta a `estado` si puede moverse (hay enlace y no hay otra acción en curso).
-4. `enlace` comprueba que el token (`ksit`) está en la lista permitida y lo escribe.
-5. `estado` pasa a EJECUTANDO; `registro` anota «enviada». Si hay cualquier problema (otro idioma, confianza baja, sin enlace, acción en curso) **no se escribe nada** y se avisa al usuario.
+Instalar Python 3.12 de [python.org](https://www.python.org/downloads/windows/)
+con el lanzador `py`. Entorno probado: Windows, Python 3.12.10 de 64 bits.
+La sintaxis requiere al menos 3.10, pero otras combinaciones no están validadas.
+Desde la carpeta que contiene `voice_bittle.py`:
 
-Importante: *enviado* no significa *ejecutado*. Solo una persona que mire al robot puede confirmar la postura.
-
-## 4. Tareas típicas
-> Solo los bloques marcados `bash` son para el Terminal. Los bloques `python` y `json` son contenido de archivos.
-
-**Probar que todo funciona** (en el Terminal de Mac se usa `python3`, no `python`; y hay que estar dentro de la carpeta del repo)
-```bash
-cd ruta/a/INGENIA-ROB-TICA_PETOI-BITTLE   # la carpeta donde clonaste el repo
-python3 -m pip install pytest
-python3 -m pytest -q                  # debe decir: 56 passed
-python3 tools/generar_evidencias.py   # regenera evidencias/ y avisa de huecos
+```powershell
+py -0p
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip check
 ```
 
-**Añadir una orden nueva (por ejemplo «túmbate» → `kfd`)**
-1. Añade la intención en `vocabulario.json` (con sus frases ES/EN y su token).
-2. Añade un caso en `tests/unit/test_nivel1_interpretacion.py` y otro de envío en `tests/integration/test_escenarios.py`.
-3. Documenta el caso en `docs/H3/casos_de_prueba.md` con un TEST-xx nuevo.
-4. `python3 tools/generar_evidencias.py`: si olvidas documentar o probar algo, lo dice.
+Dependencias base fijadas: pytest 9.2.0 y pyserial 3.5. Para voz:
 
-**Cambiar un valor (U, tiempos):** `src/config.py`, y vuelve a ejecutar las pruebas.
-
-**Escribir una prueba nueva:** copia una existente *dentro del archivo `.py`* (no se pega en el Terminal). Las marcas indican qué verifica:
-```python
-@pytest.mark.caso("TEST-33")          # identificador
-@pytest.mark.req("RF-04", "RS-01")    # requisitos de H1
-@pytest.mark.esc("ESC-09")            # escenarios
-@pytest.mark.nivel(2)                 # 1 interpretación, 2 lógica, 3 interfaz hacia el robot
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-voz.txt
+.\.venv\Scripts\python.exe -c "import vosk, sounddevice, serial; print('Imports correctos')"
 ```
 
-**Conectar el robot real (H4):** implementa un `SerialPort` con pyserial (`abrir`, `escribir`, `cerrar`, `abierto`) y pásalo a `EnlaceBittle`; usa `VoskReconocedor` en lugar de `FakeRecognizer`. El controlador no cambia.
+Vosk 0.3.45 y sounddevice 0.5.6 se instalaron e importaron en este entorno.
+Las dependencias transitivas instaladas se registran en `evidencias/entorno_H3.txt`;
+no constituye validación de todas las plataformas ni de precisión de voz.
 
-## 5. Git paso a paso (flujo recomendado)
-```bash
-git pull                          # 1. traer lo último
-git switch -c mi-cambio           # 2. rama propia para no romper main
-# ...editar, y luego:
-python3 -m pytest -q               # 3. comprobar que sigue en verde
-git status                        # 4. ver qué has cambiado
-git add -A
-git commit -m "Describe qué y por qué"
-git push -u origin mi-cambio      # 5. subir la rama
-```
-Después abre un *Pull Request* en GitHub y que lo revise tu compañero/a antes de unirlo a `main`. Para marcar la versión de H3 con un commit:
-```bash
-git log -1 --format=%h            # hash corto, que se apunta en la portada del H1 (OPEN-08)
-git tag H3
+## 3. Simulación sin robot ni micrófono
+
+```powershell
+.\.venv\Scripts\python.exe voice_bittle.py --demo
+.\.venv\Scripts\python.exe voice_bittle.py --demo --idioma en
+.\.venv\Scripts\python.exe voice_bittle.py --registro registros\sesion_manual.jsonl
 ```
 
-## 6. Reglas para no perderse
-- Una sola fuente de verdad por cosa: requisitos en el H1, especificación/plan/tareas en `specs/`, evidencias solo en `evidencias/` (generadas).
-- Si cambias un requisito, cambia el caso de prueba y vuelve a generar las evidencias el mismo día.
-- No ejecutes movimientos con el robot sin autorización del profesor y supervisión.
+La demo escribe solo `ksit` y `kup` en memoria; consultas y entradas rechazadas
+no producen bytes nuevos. El reloj fake es determinista y usa fecha ficticia;
+los registros de simulación no son mediciones temporales reales.
+
+| Control | Función |
+|---|---|
+| `/activar`, `/desactivar` | Habilitar/deshabilitar escucha manualmente |
+| Frase escrita o línea vacía | Resultado simulado o silencio, solo proveedor fake |
+| `/capturar` | Una captura de voz Vosk, si está seleccionado y escucha activa |
+| `/idioma es`, `/idioma en` | Cambiar modelo e idioma; reactivar escucha después |
+| `/estado`, `/historial` | Inspección manual sin movimientos |
+| `estado`, `historial` / `status`, `history` | Consultas por la ruta de reconocimiento |
+| `/fin` | Terminar una acción SIMULADA; postura queda estimada |
+| `/desconectar`, `/reconectar` | Inyectar fallo y recuperar enlace simulado |
+| `/reposo` | Confirmación explícita de reposo SIMULADO tras reconectar |
+| `/salir` | Cierre controlado; si está ocupado/desconocido pide resolverlo |
+
+Ejemplo: `/activar` → `siéntate` → `ponte de pie` (rechazada por ocupado)
+→ `estado` → `/fin` → `ponte de pie` → `/fin` → `/salir`.
+Reconectar no reenvía entradas previas ni acredita inmovilidad.
+EOF/Ctrl+C abandona la simulación, dejando constancia visual si el estado no se confirmó.
+
+## 4. Modelos Vosk locales y micrófono (sin robot)
+
+Obtener modelos desde el [catálogo oficial](https://alphacephei.com/vosk/models).
+Candidatos pequeños para evaluar: `vosk-model-small-es-0.42` y
+`vosk-model-small-en-us-0.15`. Descargar y extraer manualmente fuera del control
+Git, por ejemplo en `modelos/vosk-es` y `modelos/vosk-en`. La ruta debe apuntar
+a la carpeta del modelo extraído, no al ZIP ni a su directorio padre.
+No se incluyen ni descargan modelos automáticamente. Revisar licencia y registrar
+nombre, versión y hash del modelo empleado en cada ensayo.
+
+```powershell
+.\.venv\Scripts\python.exe -m sounddevice
+.\.venv\Scripts\python.exe voice_bittle.py --reconocedor vosk --modelo-es "C:\modelos\vosk-es" --modelo-en "C:\modelos\vosk-en" --dispositivo 1
+```
+
+Sustituir las rutas y el índice 1 por los reales. En consola: `/activar`,
+`/capturar`, pronunciar una frase. El enlace sigue siendo FakeSerial. Usar `/fin`
+para completar acciones simuladas, no para declarar una postura real.
+Modelo ausente: salida 1, error registrado y escucha deshabilitada. Fallo de flujo
+u overflow: captura descartada, escucha deshabilitada y aviso; recuperar dispositivo
+y activar manualmente. No se conserva ni reenvía audio fallido.
+
+### Ensayo manual pendiente (no ejecutado)
+
+1. Registrar commit/huella, Python, bibliotecas, modelo, dispositivo e idioma.
+2. Con FakeSerial, comprobar las cuatro frases de cada idioma, desconocidas,
+   silencio y desconexión del micrófono. Registrar texto/confianza y resultado.
+3. Consultas: verificar cero escrituras nuevas. Movimientos: solo bytes simulados.
+4. Repetir con Internet desactivado después de instalar dependencias y modelos.
+5. Anotar observado/veredicto/incidencias; restaurar conectividad manualmente.
+
+Este ensayo funcional no sustituye RR-01: siguen pendientes protocolo de 100
+muestras, reparto por idioma/intención, usuarios y medida acústica (OPEN-05/13).
+El mínimo de confianza por palabra no es una probabilidad calibrada de intención.
+El final de palabra Vosk es una estimación del final de voz; buffers y reloj de
+captura necesitan calibración. No declarar RR-02 cumplido con estas estimaciones.
+
+## 5. Pruebas y evidencias
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest -q
+.\.venv\Scripts\python.exe tools/generar_evidencias.py
+git diff --check
+```
+
+El generador escribe resultados, trazabilidad y `ejecucion_H3.json` (commit base,
+archivos SHA-256, cambios locales, versión Python/pytest y salida de pruebas).
+Un caso TEST puede contener varios tests parametrizados. PASS significa que ese
+caso pasó; no acredita el requisito completo. Inspección, simulación y dobles
+están identificados; pruebas reales de Vosk, Bluetooth y posturas siguen pendientes.
+No editar resultados generados a mano. Las pruebas no necesitan modelos ni hardware.
+
+## 6. Configuración futura del enlace físico
+
+Consultar [preprueba_fisica.md](docs/H3/preprueba_fisica.md). `PerfilFisico`
+exige puerto, velocidad, terminador, modelo, firmware, referencia del protocolo,
+parámetros concretos y referencias de aprobación de parámetros/seguridad.
+`PuertoSerieReal` no abre en el constructor: requiere habilitación expresa de sesión.
+El perfil es una declaración del responsable, no una aprobación automática o firma.
+No hay perfil aprobado distribuido ni opción de consola que lo habilite.
+
+```powershell
+.\.venv\Scripts\python.exe voice_bittle.py --modo fisico
+```
+
+Resultado esperado: bloqueo y salida 2, sin abrir puertos. No usar scripts de terceros
+que detecten o abran automáticamente conexiones para saltar este control.
+Identificar Bittle clásico/X/X V2 y placa/firmware reales antes de asignar protocolo.
+No asumir 115200 ni un terminador a partir de los valores de los dobles de prueba.
+
+## 7. Cierre, cambios y Git
+
+En simulación, terminar con `/fin` si procede y `/salir`. En hardware será necesario
+el procedimiento aprobado que confirme inmovilidad y contemple fallo de enlace;
+no se ha validado y no se sustituye por desconectar un puerto.
+Los logs son JSONL y pueden contener texto reconocido: conservar los necesarios
+para el ensayo, fuera de Git (`registros/` está ignorado).
+
+Antes de cambios: `git status`, revisar rama y cambios. Trabajar en una rama propia,
+ejecutar suite/generador y revisar diff. No añadir acciones ni ajustar U para obtener
+un resultado favorable. La aprobación de cambios motrices y parámetros es independiente.
+Esta entrega contiene commits locales; no se hace push ni merge sin autorización.
+
+## 8. Entrega integral y configuración portátil
+
+Descomprimir `VOICE-BITTLE-ARGOS.zip`, abrir PowerShell en su carpeta `VOICE-BITTLE`.
+Seguir la instalación del apartado 2. H1 está en docs/h1; H2 vigente está en specs;
+H3 en docs/H3, src, tests y evidencias. Empezar por PROYECTO.md. Los archivos de
+docs/historico son originales archivados, NO instrucciones vigentes.
+
+Descargar el ZIP español del catálogo oficial:
+https://alphacephei.com/vosk/models/vosk-model-small-es-0.42.zip
+Extraer conservando la carpeta `vosk-model-small-es-0.42` dentro de `modelos/`.
+No se distribuyen modelos en este paquete; tampoco entornos virtuales ni logs locales.
+
+```powershell
+.\.venv\Scripts\python.exe voice_bittle.py --modo simulado --reconocedor vosk --idioma es --modelo-es ".\modelos\vosk-model-small-es-0.42"
+.\.venv\Scripts\python.exe tools/ensayo_audio_sintetico.py --modelo ".\modelos\vosk-model-small-es-0.42"
+```
+
+El segundo comando no abre el micrófono: ensaya Vosk con PCM sintético. No mide
+precisión con voz. Modelo español cargado se ha comprobado, modelo inglés y voz
+humana siguen pendientes. En captura real, usar /activar y /capturar; no asumir
+que una frase devuelta corresponde a una intención humana.
+
+### Incidente «estado» sin habla intencionada
+
+No disponemos de la grabación ni de una reproducción controlada; no se atribuye
+causa al micrófono, ruido o modelo. Se usa ahora decodificación abierta, mínimo de
+confianza por palabra y controles de captura final/coherente, frescura y no repetición.
+El silencio digital cero se rechaza incluso si un motor simulado devuelve una orden.
+Audio no nulo NO demuestra voz humana: el ruido puede aún dar falsos positivos.
+U no está calibrado. No habilitar hardware ni declarar validación por estos cambios.
+
+Errores habituales: modelo ausente → revisar carpeta extraída y --modelo-es/en;
+No module named vosk → instalar requirements-voz.txt con el Python de .venv;
+dispositivo ausente/overflow → comprobar entrada en Windows y volver a activar;
+captura invalidada → iniciar otra captura, no reenviar un resultado anterior;
+físico bloqueado → comportamiento esperado, ver preprueba_fisica.md.
+
+Si `py -3.12` no encuentra Python pero `python --version` muestra 3.12, usar `python -m venv .venv`. No continuar con otra versión sin verificarla. En las pruebas de procesos se fija UTF-8 explícitamente para evitar diferencias de codificación de Windows.
