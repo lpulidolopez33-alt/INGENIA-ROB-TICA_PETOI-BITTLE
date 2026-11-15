@@ -1,24 +1,30 @@
-# VOICE-BITTLE — proyecto integral ARGOS
+# Índice de la entrega final
 
-Una única entrega: requisitos → diseño → implementación → pruebas y evidencias.
+| Parte | Contenido |
+|---|---|
+| Aplicación | bittle_web.py, bittle_voz.py, web/index.html, INICIAR_PANEL.bat |
+| Instalación y operación | [GUIA](GUIA.md), [panel](PANEL_WEB.md), [secuencias](SECUENCIAS.md) |
+| H1 | [Requisitos v0.4](docs/h1/H1_v0.4.md) · [PDF](docs/h1/H1_v0.4.pdf) |
+| Evolución de alcance | [Decisiones sobre requisitos](docs/h1/EVOLUCION_REQUISITOS.md) |
+| H2 | [Especificación](specs/001-voice-bittle-spec/spec.md), [plan](specs/001-voice-bittle-spec/plan.md), [datos](specs/001-voice-bittle-spec/data-model.md), [contratos](specs/001-voice-bittle-spec/contracts/interfaces.md) |
+| Gestión | [Tareas](specs/001-voice-bittle-spec/tasks.md), [decisiones](specs/001-voice-bittle-spec/decision-log.md), [metodología](docs/METODOLOGIA.md) |
+| H3 | [Informe](docs/H3/informe_desarrollo.md), [casos](docs/H3/casos_actuales.md), [resultados](evidencias/actual/RESULTADOS.md) |
+| Uso físico | [Confirmaciones del usuario](docs/H3/validacion_usuario.md), [caracterización adicional](docs/H3/preprueba_fisica.md) |
+| Verificación | tests/unit/, tools/generar_evidencias_actuales.py, tools/verificar_documentacion.py |
+| Distribución | tools/empaquetar.py, VERSION_ENTREGA.json, MANIFIESTO_ENTREGA.json |
 
-| Fase | Fuente vigente | Conexión con la siguiente fase |
-|---|---|---|
-| H1 | docs/h1/H1_v0.2.pdf, intacto y pendiente de revisión formal | 13 ESC, 7 NEC, 34 requisitos y OPEN-01…15 |
-| H2 | specs/001-voice-bittle-spec/spec.md y plan.md | Matriz H1 §6.1, módulos existentes y tareas históricas conservadas |
-| H3 | src/, voice_bittle.py, tests/, tools/, docs/H3/ | Casos TEST-01…37, resultados y manifiesto de código en evidencias/ |
-| H4 pendiente | docs/H3/preprueba_fisica.md y TEST-F01…F10 | Voz real, Bluetooth, posturas, seguridad y aceptación no acreditadas |
+H1 v0.4 es la línea base vigente: 16 requisitos ACT, compartidos por H2 y la
+trazabilidad ejecutable. El [catálogo](docs/COMANDOS.md) corresponde al parser real.
+La entrega conserva 49 pruebas de cola y panel; las pruebas de implementaciones
+retiradas no se cuentan como cobertura de esta versión.
 
-GUIA.md es la única guía de instalación y uso. README.md da el inicio rápido.
-ENTREGA_COMPANEROS.md resume esta revisión. El informe de desarrollo conserva el
-historial: sus recuentos anteriores están fechados y no sustituyen los resultados
-actuales generados. docs/historico conserva originales sin modificar y no es normativo.
-La constitución tiene una nota de alineación propuesta; no se ha ratificado una nueva versión.
+No se incluyen históricos, código anterior ni plantillas de herramientas sin uso.
+El entorno .venv permite ejecutar localmente pero se excluye del ZIP, junto con
+modelos, cachés y registros. Los resultados automáticos, la confirmación del usuario
+y las mediciones físicas son evidencias diferentes; no se confunden.
 
-No hay carpeta H2 duplicada: la documentación H2 vigente es specs/. No se inventan
-equivalencias entre REQ históricos y RF/RR/RS vigentes. No se cierran OPEN por tener
-pruebas verdes con dobles. Un comando escrito no acredita una postura física.
+Estado de entrega, evolución del alcance y pendientes académicos: [Cierre y H4](docs/H3/CIERRE_Y_H4.md).
 
-El ZIP excluye .git, .venv, modelos, cachés, secretos y logs locales. Incluye herramientas
-Spec Kit originales para referencia; sus operaciones Git requieren un checkout Git,
-pero la aplicación, pytest y el generador funcionan desde el ZIP sin Git.
+Fuentes docentes: [FUENTES](docs/FUENTES.md). Equipo: [integrantes](docs/EQUIPO.md). Riesgos: [OPEN](docs/h1/ASUNTOS_ABIERTOS.md).
+
+Revisión del encargo docente y pendientes: [REVISION_MOODLE](docs/REVISION_MOODLE.md).

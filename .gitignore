@@ -4,3 +4,7 @@ __pycache__/
 .venv/
 modelos/
 registros/
+
+!.specify/feature.json
+
+evidencias/actual/historial_h3.bundle

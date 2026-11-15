@@ -1,192 +1,135 @@
-# Guía práctica VOICE-BITTLE (Windows / PowerShell)
+# Instalación y uso — aplicación actual
 
-## 1. Qué se ha integrado
+Windows / PowerShell. Entorno constatado: Python 3.12.10 de 64 bits. No se afirma
+compatibilidad probada con Python 3.14 por el comentario que traía el ZIP original.
 
-Se reutilizan el controlador, vocabulario, traductor, estados, avisos, registro e
-interfaces existentes. `voice_bittle.py` inicia una consola. `FakeRecognizer`
-simula texto/confianza; `VoskReconocedor` usa modelos locales y micrófono.
-Ambos alimentan el mismo controlador. `FakeSerial` registra bytes sin hardware.
-`PuertoSerieReal` prepara el transporte pyserial para H4, bloqueado sin perfil y
-habilitación; la consola no ofrece aún habilitación física.
+## Instalar
 
-Flujo: voz → traductor → controlador/estado → enlace. Consultas → vista/registro,
-sin pasar por envío. `seguridad.py` fija la política de dos acciones. Los errores,
-la confianza inválida, escucha desactivada, modelo ausente o estado desconocido
-impiden nuevas escrituras motrices. Los avisos actuales son visuales; TTS pendiente.
-
-## 2. Instalación reproducible
-
-Instalar Python 3.12 de [python.org](https://www.python.org/downloads/windows/)
-con el lanzador `py`. Entorno probado: Windows, Python 3.12.10 de 64 bits.
-La sintaxis requiere al menos 3.10, pero otras combinaciones no están validadas.
-Desde la carpeta que contiene `voice_bittle.py`:
+Abre una terminal en la carpeta que contiene `bittle_web.py`:
 
 ```powershell
-py -0p
-py -3.12 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+python --version
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements-bittle.txt
 .\.venv\Scripts\python.exe -m pip check
 ```
 
-Dependencias base fijadas: pytest 9.2.0 y pyserial 3.5. Para voz:
+Si ya tienes `.venv` funcionando, no necesitas recrearlo. Las dependencias de uso
+son Vosk, sounddevice, pyserial y bleak, con versiones en ese archivo. Para pruebas:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements-voz.txt
-.\.venv\Scripts\python.exe -c "import vosk, sounddevice, serial; print('Imports correctos')"
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-Vosk 0.3.45 y sounddevice 0.5.6 se instalaron e importaron en este entorno.
-Las dependencias transitivas instaladas se registran en `evidencias/entorno_H3.txt`;
-no constituye validación de todas las plataformas ni de precisión de voz.
+El HTML, CSS y JavaScript se sirven desde Python; no necesitas Node, npm, Flask,
+Internet durante la ejecución ni una cuenta en un servicio de voz.
 
-## 3. Simulación sin robot ni micrófono
+## Modelo de español
+
+Descarga `vosk-model-small-es-0.42` del [catálogo oficial](https://alphacephei.com/vosk/models)
+y extrae la carpeta dentro de `modelos/`. Debe contener, entre otras, `am/`.
+No se distribuye el modelo ni el entorno virtual. Usa una ruta de carpeta, no el ZIP.
 
 ```powershell
-.\.venv\Scripts\python.exe voice_bittle.py --demo
-.\.venv\Scripts\python.exe voice_bittle.py --demo --idioma en
-.\.venv\Scripts\python.exe voice_bittle.py --registro registros\sesion_manual.jsonl
+$modelo = ".\modelos\vosk-model-small-es-0.42"
+Test-Path "$modelo\am"
 ```
 
-La demo escribe solo `ksit` y `kup` en memoria; consultas y entradas rechazadas
-no producen bytes nuevos. El reloj fake es determinista y usa fecha ficticia;
-los registros de simulación no son mediciones temporales reales.
+El panel propone `modelos/vosk-model-small-es-0.42`, dentro del proyecto.
+Descarga y extrae el modelo antes de activar el micrófono, o indica otra carpeta válida.
+Las rutas relativas se resuelven desde el directorio donde arrancas Python;
+`INICIAR_PANEL.bat` cambia automáticamente a la carpeta del programa.
 
-| Control | Función |
+## Panel web (opción principal)
+
+```powershell
+.\.venv\Scripts\python.exe -X utf8 bittle_web.py
+```
+
+O doble clic en `INICIAR_PANEL.bat`. Sigue [PANEL_WEB.md](PANEL_WEB.md).
+No abras `web/index.html` como archivo: requiere el servidor Python.
+
+## Consola alternativa
+
+```powershell
+.\.venv\Scripts\python.exe -X utf8 bittle_voz.py --simulado --texto
+.\.venv\Scripts\python.exe -X utf8 bittle_voz.py --simulado --modelo $modelo --microfono 1
+.\.venv\Scripts\python.exe -X utf8 bittle_voz.py --listar
+```
+
+El índice 1 fue el usado durante la sesión; elige el real que enumere tu equipo.
+La consola de voz escucha continuamente al arrancar: no usa `/activar` ni `/capturar`.
+Por teclado, escribe la frase y pulsa Enter. No hay consultas «estado»/«historial»
+por voz en esta aplicación. 
+
+## Bittle real por Bluetooth serie
+
+Empareja el robot en Windows y revisa Más opciones de Bluetooth → Puertos COM.
+Selecciona el **saliente** asociado a Petoi; no el menor número ni una dirección
+BLE sin identificar. El usuario identificó Bittle normal, Petoi-30AD y COM6 saliente.
+Ese número puede cambiar entre ordenadores o emparejamientos.
+Cierra otras aplicaciones que usen el puerto. No ejecutes panel y consola sobre
+el mismo robot a la vez.
+
+```powershell
+.\.venv\Scripts\python.exe -X utf8 bittle_voz.py --puerto COM6 --texto
+.\.venv\Scripts\python.exe -X utf8 bittle_voz.py --puerto COM6 --modelo $modelo --microfono 1
+```
+
+Estos comandos abren hardware y pueden provocar movimiento. El código usa 115200
+baudios y añade LF a cada token; en consola se puede cambiar `--baudios`, en panel no.
+Son parámetros de esta implementación y del uso comunicado, no una garantía para
+todos los firmwares. La apertura espera hasta 10 s por «Ready» pero continúa sin
+recibirlo. No requiere un perfil físico adicional.
+
+BLE está disponible solo en la consola (`--ble --direccion-ble DIRECCION_REAL`).
+No se ha verificado aquí con el robot. Sin dirección, selecciona un candidato por
+nombre y puede recurrir a cualquier característica escribible: no asumir identidad
+ni compatibilidad a partir de una búsqueda. El panel ofrece solo COM y simulación.
+
+## Cierre y problemas frecuentes
+
+PARA solicita equilibrio y cancela pendientes. Apagar micrófono no cancela la cola.
+Ctrl+C en consola, o Desconectar en panel, cancela pendientes e intenta `krest`;
+puede mover el robot y no confirma inmovilidad. Cerrar la pestaña deja el servidor
+funcionando. Detalles y límites: [SECUENCIAS.md](SECUENCIAS.md).
+
+| Problema | Comprobación |
 |---|---|
-| `/activar`, `/desactivar` | Habilitar/deshabilitar escucha manualmente |
-| Frase escrita o línea vacía | Resultado simulado o silencio, solo proveedor fake |
-| `/capturar` | Una captura de voz Vosk, si está seleccionado y escucha activa |
-| `/idioma es`, `/idioma en` | Cambiar modelo e idioma; reactivar escucha después |
-| `/estado`, `/historial` | Inspección manual sin movimientos |
-| `estado`, `historial` / `status`, `history` | Consultas por la ruta de reconocimiento |
-| `/fin` | Terminar una acción SIMULADA; postura queda estimada |
-| `/desconectar`, `/reconectar` | Inyectar fallo y recuperar enlace simulado |
-| `/reposo` | Confirmación explícita de reposo SIMULADO tras reconectar |
-| `/salir` | Cierre controlado; si está ocupado/desconocido pide resolverlo |
+| Falta una biblioteca | Instalar los requirements con el Python de `.venv` |
+| No encuentra modelo | Revisar carpeta extraída y ruta en el panel o `--modelo` |
+| COM ocupado | Cerrar consola, app Petoi o monitor serie que use ese puerto |
+| No reconoce | Revisar dispositivo, medidor, frase recibida y catálogo; probar primero en simulación |
+| Micrófono apagado tras error | Revisar mensaje, dispositivo y volver a activar |
+| Panel no abre | Mantener terminal abierta, usar 127.0.0.1; cambiar `--puerto-web 8766` si está ocupado |
+| «Puerto abierto» pero no responde | No acredita robot operativo; revisar enlace, batería, firmware y procedimiento físico |
 
-Ejemplo: `/activar` → `siéntate` → `ponte de pie` (rechazada por ocupado)
-→ `estado` → `/fin` → `ponte de pie` → `/fin` → `/salir`.
-Reconectar no reenvía entradas previas ni acredita inmovilidad.
-EOF/Ctrl+C abandona la simulación, dejando constancia visual si el estado no se confirmó.
-
-## 4. Modelos Vosk locales y micrófono (sin robot)
-
-Obtener modelos desde el [catálogo oficial](https://alphacephei.com/vosk/models).
-Candidatos pequeños para evaluar: `vosk-model-small-es-0.42` y
-`vosk-model-small-en-us-0.15`. Descargar y extraer manualmente fuera del control
-Git, por ejemplo en `modelos/vosk-es` y `modelos/vosk-en`. La ruta debe apuntar
-a la carpeta del modelo extraído, no al ZIP ni a su directorio padre.
-No se incluyen ni descargan modelos automáticamente. Revisar licencia y registrar
-nombre, versión y hash del modelo empleado en cada ensayo.
+## Verificación reproducible sin robot
 
 ```powershell
-.\.venv\Scripts\python.exe -m sounddevice
-.\.venv\Scripts\python.exe voice_bittle.py --reconocedor vosk --modelo-es "C:\modelos\vosk-es" --modelo-en "C:\modelos\vosk-en" --dispositivo 1
+.\.venv\Scripts\python.exe -X utf8 tools/generar_evidencias_actuales.py
+.\.venv\Scripts\python.exe -X utf8 tools/verificar_documentacion.py
 ```
 
-Sustituir las rutas y el índice 1 por los reales. En consola: `/activar`,
-`/capturar`, pronunciar una frase. El enlace sigue siendo FakeSerial. Usar `/fin`
-para completar acciones simuladas, no para declarar una postura real.
-Modelo ausente: salida 1, error registrado y escucha deshabilitada. Fallo de flujo
-u overflow: captura descartada, escucha deshabilitada y aviso; recuperar dispositivo
-y activar manualmente. No se conserva ni reenvía audio fallido.
+El primer comando ejecuta las 49 pruebas de la aplicación final y genera resultados.
+El segundo revisa vínculos, requisitos, catálogo y huellas. El test HTTP necesita
+conexiones locales a 127.0.0.1; un sandbox que las prohíba no acredita un fallo del panel.
 
-### Ensayo manual pendiente (no ejecutado)
+## Uso de voz acordado
 
-1. Registrar commit/huella, Python, bibliotecas, modelo, dispositivo e idioma.
-2. Con FakeSerial, comprobar las cuatro frases de cada idioma, desconocidas,
-   silencio y desconexión del micrófono. Registrar texto/confianza y resultado.
-3. Consultas: verificar cero escrituras nuevas. Movimientos: solo bytes simulados.
-4. Repetir con Internet desactivado después de instalar dependencias y modelos.
-5. Anotar observado/veredicto/incidencias; restaurar conectividad manualmente.
+Usar el panel con el micrófono apagado salvo al dictar: activar, esperar Escuchando,
+decir la orden o secuencia, comprobar su aceptación y desactivar inmediatamente.
+La cola sigue ejecutándose con la escucha apagada; para cancelar se pulsa PARA en
+el panel. Es una operación manual, no un modo automático ni una confirmación previa.
+Procedimiento y límites: [estrategia de escucha](PANEL_WEB.md#estrategia-de-escucha-manual-acordada).
 
-Este ensayo funcional no sustituye RR-01: siguen pendientes protocolo de 100
-muestras, reparto por idioma/intención, usuarios y medida acústica (OPEN-05/13).
-El mínimo de confianza por palabra no es una probabilidad calibrada de intención.
-El final de palabra Vosk es una estimación del final de voz; buffers y reloj de
-captura necesitan calibración. No declarar RR-02 cumplido con estas estimaciones.
 
-## 5. Pruebas y evidencias
+## Recuperación tras un fallo serie
 
-```powershell
-.\.venv\Scripts\python.exe -m pytest -q
-.\.venv\Scripts\python.exe tools/generar_evidencias.py
-git diff --check
-```
+No se reenvían comandos automáticamente. Si el error indica resultado desconocido,
+no se sabe si el robot recibió la orden. Desactivar escucha, revisar el estado y
+desconectar; tras revisar la situación, conectar manualmente una nueva sesión.
+La cola anterior se descarta: solo las nuevas órdenes explícitas se aceptan en ella.
+Si el enlace está bloqueado, ni PARA ni el descanso de cierre se transmiten.
+La escritura completa no confirma que el movimiento físico se haya realizado.
 
-El generador escribe resultados, trazabilidad y `ejecucion_H3.json` (commit base,
-archivos SHA-256, cambios locales, versión Python/pytest y salida de pruebas).
-Un caso TEST puede contener varios tests parametrizados. PASS significa que ese
-caso pasó; no acredita el requisito completo. Inspección, simulación y dobles
-están identificados; pruebas reales de Vosk, Bluetooth y posturas siguen pendientes.
-No editar resultados generados a mano. Las pruebas no necesitan modelos ni hardware.
-
-## 6. Configuración futura del enlace físico
-
-Consultar [preprueba_fisica.md](docs/H3/preprueba_fisica.md). `PerfilFisico`
-exige puerto, velocidad, terminador, modelo, firmware, referencia del protocolo,
-parámetros concretos y referencias de aprobación de parámetros/seguridad.
-`PuertoSerieReal` no abre en el constructor: requiere habilitación expresa de sesión.
-El perfil es una declaración del responsable, no una aprobación automática o firma.
-No hay perfil aprobado distribuido ni opción de consola que lo habilite.
-
-```powershell
-.\.venv\Scripts\python.exe voice_bittle.py --modo fisico
-```
-
-Resultado esperado: bloqueo y salida 2, sin abrir puertos. No usar scripts de terceros
-que detecten o abran automáticamente conexiones para saltar este control.
-Identificar Bittle clásico/X/X V2 y placa/firmware reales antes de asignar protocolo.
-No asumir 115200 ni un terminador a partir de los valores de los dobles de prueba.
-
-## 7. Cierre, cambios y Git
-
-En simulación, terminar con `/fin` si procede y `/salir`. En hardware será necesario
-el procedimiento aprobado que confirme inmovilidad y contemple fallo de enlace;
-no se ha validado y no se sustituye por desconectar un puerto.
-Los logs son JSONL y pueden contener texto reconocido: conservar los necesarios
-para el ensayo, fuera de Git (`registros/` está ignorado).
-
-Antes de cambios: `git status`, revisar rama y cambios. Trabajar en una rama propia,
-ejecutar suite/generador y revisar diff. No añadir acciones ni ajustar U para obtener
-un resultado favorable. La aprobación de cambios motrices y parámetros es independiente.
-Esta entrega contiene commits locales; no se hace push ni merge sin autorización.
-
-## 8. Entrega integral y configuración portátil
-
-Descomprimir `VOICE-BITTLE-ARGOS.zip`, abrir PowerShell en su carpeta `VOICE-BITTLE`.
-Seguir la instalación del apartado 2. H1 está en docs/h1; H2 vigente está en specs;
-H3 en docs/H3, src, tests y evidencias. Empezar por PROYECTO.md. Los archivos de
-docs/historico son originales archivados, NO instrucciones vigentes.
-
-Descargar el ZIP español del catálogo oficial:
-https://alphacephei.com/vosk/models/vosk-model-small-es-0.42.zip
-Extraer conservando la carpeta `vosk-model-small-es-0.42` dentro de `modelos/`.
-No se distribuyen modelos en este paquete; tampoco entornos virtuales ni logs locales.
-
-```powershell
-.\.venv\Scripts\python.exe voice_bittle.py --modo simulado --reconocedor vosk --idioma es --modelo-es ".\modelos\vosk-model-small-es-0.42"
-.\.venv\Scripts\python.exe tools/ensayo_audio_sintetico.py --modelo ".\modelos\vosk-model-small-es-0.42"
-```
-
-El segundo comando no abre el micrófono: ensaya Vosk con PCM sintético. No mide
-precisión con voz. Modelo español cargado se ha comprobado, modelo inglés y voz
-humana siguen pendientes. En captura real, usar /activar y /capturar; no asumir
-que una frase devuelta corresponde a una intención humana.
-
-### Incidente «estado» sin habla intencionada
-
-No disponemos de la grabación ni de una reproducción controlada; no se atribuye
-causa al micrófono, ruido o modelo. Se usa ahora decodificación abierta, mínimo de
-confianza por palabra y controles de captura final/coherente, frescura y no repetición.
-El silencio digital cero se rechaza incluso si un motor simulado devuelve una orden.
-Audio no nulo NO demuestra voz humana: el ruido puede aún dar falsos positivos.
-U no está calibrado. No habilitar hardware ni declarar validación por estos cambios.
-
-Errores habituales: modelo ausente → revisar carpeta extraída y --modelo-es/en;
-No module named vosk → instalar requirements-voz.txt con el Python de .venv;
-dispositivo ausente/overflow → comprobar entrada en Windows y volver a activar;
-captura invalidada → iniciar otra captura, no reenviar un resultado anterior;
-físico bloqueado → comportamiento esperado, ver preprueba_fisica.md.
-
-Si `py -3.12` no encuentra Python pero `python --version` muestra 3.12, usar `python -m venv .venv`. No continuar con otra versión sin verificarla. En las pruebas de procesos se fija UTF-8 explícitamente para evitar diferencias de codificación de Windows.

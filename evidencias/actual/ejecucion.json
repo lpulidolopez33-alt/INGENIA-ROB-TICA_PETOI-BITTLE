@@ -1,0 +1,299 @@
+{
+  "fecha_utc": "2026-11-13T10:33:51.146284+00:00",
+  "python": "3.12.10",
+  "interprete": "python",
+  "sistema": "Windows-11-10.0.26300-SP0",
+  "comando": [
+    "python",
+    "-X",
+    "utf8",
+    "-m",
+    "pytest",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--junitxml=evidencias/actual/pytest.xml",
+    "tests"
+  ],
+  "codigo_salida": 0,
+  "total": 49,
+  "pasadas": 49,
+  "alcance": "suite completa; sin hardware ni microfono real; incluye servidor HTTP localhost",
+  "fuentes_sha256": {
+    "bittle_voz.py": "f3150e231f71da7f7f14246d4fbc00aedd68c3290d15ed50ade627f656f8119d",
+    "bittle_web.py": "4bcda9a87c1c36572bcb29a9361e9a6b22b9844f105a8f29eb7d1eacaf4a8a1a",
+    "docs/h1/H1_v0.4.md": "6e1d812a9ee28c272e531b539d1aa1922ae21a38ba5038622fc99ca7af78c596",
+    "INICIAR_PANEL.bat": "7faedad156c344b7ba3e7653b4df9dd9acd529db725a88493afbded4fb74cb42",
+    "pytest.ini": "962e7f54415c3f856486839c3874f51245a98e3c563e8571b33387a783cc93a3",
+    "requirements-bittle.txt": "f0d813d186e7edbccad01169d2141470a6318dd2d07a2c5463115d6ae000d72b",
+    "requirements.txt": "e53b601eb98b819589c1e8fd9b37a5d50f14729fbb0f1942f65463b8b08a1471",
+    "specs/001-voice-bittle-spec/trazabilidad_actual.json": "1237408f966984d9e5e2118db908ed61f180f5f0daf3e68bc34d6cfa4f1292e5",
+    "tests/unit/test_cierre_final.py": "9b53b353cd1db49f82053fbc48a1129d41576c3360f1ba6807ed644531fb2677",
+    "tests/unit/test_cola_bittle_voz.py": "497005270d37003def62b42dd6910813a2e6113c63f60a2acb35861a803197de",
+    "tests/unit/test_contratos_moodle.py": "2f7b5f0ced57dda60cdc75738c01e581f0a1220f4b2051f6c6cc8c66968bb2e0",
+    "tests/unit/test_panel_web.py": "8c9f71f6e9223fd50008e1f80e0a14ee54769813380d718b3fe9e7bf07511b17",
+    "tools/empaquetar.py": "3f0afff7eeb757ff09e2acbff1b8dd8bc8279c123e10563509451314503d3437",
+    "tools/generar_evidencias_actuales.py": "f944c7f1d4211e6f83bb69346ec9ec9c35e454462c360b973cf44352dcdb94e7",
+    "tools/generar_h1_pdf.py": "0d2c95b51224f5d814c7e2167e24ff42ad6d9de75df9ad050d149884bcda83a6",
+    "tools/verificar_documentacion.py": "d1ad246190ade0b997f3307592708ba73911812f5b002e7e87f9be0fb7215baf",
+    "tools/verificar_zip.py": "4e0e4213b6232fd33bc45a1339a355712166987a03032fc539c6e6bb37d1188b",
+    "web/index.html": "854ec20f78d9f4a20edfbd2f5476d62d0eb494e4a843b242e1aca4959aa9324f"
+  },
+  "casos": [
+    {
+      "clase": "tests.unit.test_cierre_final",
+      "nombre": "test_envio_incierto_no_repite_y_conserva_resultado[escritura-escritura]",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cierre_final",
+      "nombre": "test_envio_incierto_no_repite_y_conserva_resultado[parcial-escritura]",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cierre_final",
+      "nombre": "test_envio_incierto_no_repite_y_conserva_resultado[vaciado-vaciado]",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cierre_final",
+      "nombre": "test_envio_incierto_no_repite_y_conserva_resultado[lectura-lectura_respuesta]",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cierre_final",
+      "nombre": "test_fallo_previo_no_escribe_y_recuperacion_es_explicita",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cierre_final",
+      "nombre": "test_fallo_serie_descarta_cola_y_no_transmite_al_cerrar",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cierre_final",
+      "nombre": "test_fallo_con_parada_no_conserva_movimientos_añadidos",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cierre_final",
+      "nombre": "test_cancelacion_antes_de_seleccionar_envio_no_ejecuta_orden",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cierre_final",
+      "nombre": "test_resultado_vosk_vacio_invalido_no_es_orden[{}]",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cierre_final",
+      "nombre": "test_resultado_vosk_vacio_invalido_no_es_orden[[]]",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cierre_final",
+      "nombre": "test_resultado_vosk_vacio_invalido_no_es_orden[null]",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cierre_final",
+      "nombre": "test_resultado_vosk_vacio_invalido_no_es_orden[{]",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cierre_final",
+      "nombre": "test_resultado_vosk_vacio_invalido_no_es_orden[{\"partial\":\"camina\"}]",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cierre_final",
+      "nombre": "test_resultado_vosk_vacio_invalido_no_es_orden[{\"text\":null}]",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cierre_final",
+      "nombre": "test_resultado_vosk_vacio_invalido_no_es_orden[{\"text\":7}]",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cierre_final",
+      "nombre": "test_resultado_vosk_vacio_invalido_no_es_orden[{\"text\":\"  \"}]",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cierre_final",
+      "nombre": "test_audio_invalido_no_envia_y_nueva_activacion_no_reutiliza",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cierre_final",
+      "nombre": "test_arranque_http_no_abre_hardware_ni_transmite",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cola_bittle_voz",
+      "nombre": "test_interpretacion[Si\\xe9ntate y despu\\xe9s ponte de pie-tokens0]",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cola_bittle_voz",
+      "nombre": "test_interpretacion[primero si\\xe9ntate, luego lev\\xe1ntate, saluda y descansa-tokens1]",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cola_bittle_voz",
+      "nombre": "test_interpretacion[marcha atr\\xe1s y ponte de pie-tokens2]",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cola_bittle_voz",
+      "nombre": "test_interpretacion[si\\xe9ntate y si\\xe9ntate-tokens3]",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cola_bittle_voz",
+      "nombre": "test_interpretacion[camina y PARA y saluda-tokens4]",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cola_bittle_voz",
+      "nombre": "test_interpretacion[no camina-tokens5]",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cola_bittle_voz",
+      "nombre": "test_interpretacion[si\\xe9ntate [unk] camina-tokens6]",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cola_bittle_voz",
+      "nombre": "test_interpretacion[si\\xe9ntate y vuela-tokens7]",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cola_bittle_voz",
+      "nombre": "test_fifo_frases_separadas_y_repeticiones",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cola_bittle_voz",
+      "nombre": "test_parada_cancela_espera_y_pendientes",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cola_bittle_voz",
+      "nombre": "test_coreografia_completa_antes_de_siguiente",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cola_bittle_voz",
+      "nombre": "test_parada_corta_coreografia",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cola_bittle_voz",
+      "nombre": "test_caminar_tiene_fin_temporizado",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cola_bittle_voz",
+      "nombre": "test_error_descarta_secuencia",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cola_bittle_voz",
+      "nombre": "test_limite_rechaza_frase_entera",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_cola_bittle_voz",
+      "nombre": "test_cierre_descarta_pendientes_y_termina_hilo",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_contratos_moodle",
+      "nombre": "test_dos_ordenes_y_desconocida_por_http",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_contratos_moodle",
+      "nombre": "test_formato_serie_ascii_lf_sin_puerto",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_contratos_moodle",
+      "nombre": "test_parada_preservada_durante_error",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_contratos_moodle",
+      "nombre": "test_audio_saturado_apaga_sin_aceptar_orden",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_contratos_moodle",
+      "nombre": "test_eventos_limitados_conservan_mas_recientes",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_contratos_moodle",
+      "nombre": "test_esperas_minimas_y_parametro_invalido",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_panel_web",
+      "nombre": "test_arranque_sin_conexion_ni_escucha",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_panel_web",
+      "nombre": "test_simulacion_cola_y_desconexion",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_panel_web",
+      "nombre": "test_parada_visible_descarta_pendientes",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_panel_web",
+      "nombre": "test_error_conexion_restaura_estado",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_panel_web",
+      "nombre": "test_modelo_ausente_no_activa_microfono",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_panel_web",
+      "nombre": "test_apagar_durante_carga_no_abre_captura",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_panel_web",
+      "nombre": "test_microfono_informa_error_de_apertura",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_panel_web",
+      "nombre": "test_resultado_tardio_no_se_encola_al_apagar",
+      "resultado": "PASS"
+    },
+    {
+      "clase": "tests.unit.test_panel_web",
+      "nombre": "test_http_pagina_estado_y_proteccion_de_acciones",
+      "resultado": "PASS"
+    }
+  ],
+  "dependencias_entorno_pruebas": [
+    "Pygments==2.21.0",
+    "colorama==0.4.6",
+    "iniconfig==2.3.1",
+    "packaging==26.3",
+    "pip==25.0.1",
+    "pluggy==1.7.0",
+    "pyserial==3.5",
+    "pytest==9.2.0"
+  ]
+}

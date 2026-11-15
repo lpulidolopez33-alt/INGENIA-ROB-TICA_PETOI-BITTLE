@@ -1,105 +1,110 @@
-# Plan de implementación: VOICE-BITTLE
+# Arquitectura implementada y plan de evolución
 
-**Versión**: 0.3 (alineado con H1 v0.2 y con el código de `src/`) · **Fecha**: 2026-11-12 · **Spec**: [spec.md](spec.md)
+Versión documental 0.5 · 2026-11-12. Arquitectura y componentes de la versión final.
 
-## Resumen
+```mermaid
+flowchart LR
+    U[Usuario] --> H[HTML local]
+    H --> P[Panel Python y API HTTP]
+    M[Micrófono del PC] --> V[Vosk local]
+    V --> P
+    T[Consola voz o texto] --> C[Parser y cola]
+    P --> C
+    C --> S[Simulación o transporte]
+    S --> B[Bittle]
+    P --> E[Estado y eventos en memoria]
+    E --> H
+```
 
-Aplicación de escritorio en Python que escucha órdenes de voz (ES/EN), valida cada una contra un vocabulario cerrado y un umbral de confianza, decide con una máquina de estados si puede ejecutarse y envía `ksit`/`kup` al Bittle por un enlace serie sobre Bluetooth. Toda entrada se registra. El núcleo no depende del micrófono ni del robot: se prueba con sustitutos (`FakeRecognizer`, `FakeSerial`, `FakeReloj`).
+## Componentes y concurrencia
 
-## Contexto técnico
-
-| Aspecto | Decisión |
+| Archivo/componente | Responsabilidad |
 |---|---|
-| Lenguaje | Python 3.12.10 verificado en Windows; sintaxis del código requiere ≥3.10. La API Petoi 3.6+ no fija nuestro entorno |
-| Dependencias | pyserial 3.5 (enlace), Vosk + sounddevice (voz real), pytest (pruebas) |
-| Almacenamiento | Frases en JSON, acciones en política fija; registro JSON Lines |
-| Pruebas | pytest, 3 niveles sin robot; ensayos físicos en H4 |
-| Restricciones | Sin Internet tras la instalación (RR-03); sin acción con entradas no válidas (RS-01); sin movimiento sin enlace (RO-02); ensayos con movimiento supervisados (RO-01) |
-| Valores provisionales | U = 0,80; T_aviso = 2 s; T_enlace = 2 s; T_escucha = 5 s; RR-02 = 3 s (`src/config.py`) |
+| `web/index.html` | HTML/CSS/JS sin dependencias web; GET estado cada 500 ms y acciones POST; botones, medidor y lista de pendientes |
+| `bittle_web.Panel` | Sesión compartida por pestañas, bloqueo RLock del estado, serialización de conectar/desconectar y captura cancelable |
+| `bittle_web.crear_servidor` | ThreadingHTTPServer, localhost, validación de peticiones y rutas documentadas |
+| `bittle_voz.buscar_comandos` | Normalización, alias, secuencias, conectores y prioridad absoluta de parada |
+| `bittle_voz.ColaAcciones` | Condition + deque, un hilo ejecutor, generación de cancelación y espera interrumpible |
+| `EnlaceSerie` | pyserial, 115200 por defecto, ASCII+LF, espera de arranque, lectura informativa, sin reenvío y recuperación manual |
+| `EnlaceBLE` | bleak en bucle asyncio dedicado; solo CLI, fragmentos de hasta 20 bytes |
+| `EnlaceSimulado` | Imprime token, sin hardware |
+| `COREOGRAFIAS` | Pasos y esperas de baile/Cristiano; puede invocar voz Windows como efecto, no como aviso general |
 
-## Arquitectura
+La cola usa generación para invalidar el resto de una acción; no puede retirar una
+escritura ya iniciada. La comprobación de generación y el envío no son atómicos:
+un paso ya seleccionado puede salir antes de la parada. Si falla un envío,
+descarta los movimientos pendientes; si hubo PARA concurrente, conserva solo esa solicitud. El transporte serie fallido permanece bloqueado hasta crear una nueva sesión.
+Estado visible en cola es actividad del hilo Python, no postura del robot.
 
-```
-micrófono ─► voz ─► traductor ─► app/controlador ─► estado ─► enlace ─► Bittle
-                                      │
-                         avisos · registro · interfaz
-```
+## Captura: diferencias importantes
 
-| Módulo (`src/`) | Responsabilidad | Requisitos principales |
-|---|---|---|
-| `vocabulario` | Frases ES/EN (JSON); autorización separada en seguridad.py | RF-01, RS-01 |
-| `voz` | Interfaz `Recognizer`; `FakeRecognizer`; adaptador Vosk | RF-01, RR-03, RD-02 |
-| `traductor` | ¿Orden válida? (vocabulario, idioma, confianza ≥ U) | RF-04, RS-01 |
-| `estado` | DESCONECTADO / REPOSO / EJECUTANDO / DESCONOCIDO | RF-05, RF-09, RO-02, RS-02 |
-| `enlace` | Interfaz `SerialPort`; `FakeSerial`; lista blanca de tokens | RI-01, RI-02, RS-01 |
-| `registro` | JSON Lines con fecha, hora, texto, resultado, motivo | RM-01, RM-02 |
-| `avisos` | Mensajes visuales y de voz | RF-06, RU-02 |
-| `interfaz` | Modelo de vista (enlace, idioma, escucha, órdenes, estado) | RI-03…RI-07, RU-01 |
-| `app/controlador` | Orquesta los escenarios ESC-01…12 | RF-02…RF-10 |
+Panel: 16 kHz, mono PCM int16, bloques 4000, cola de audio de 8 bloques,
+comprobación de cancelación antes de aceptar texto final. Error del dispositivo
+se presenta y apaga escucha. Cargar modelo puede tardar; apagar invalida la sesión
+sin abortar forzosamente la carga. El hilo anterior debe terminar antes de reactivar.
 
-## Decisiones de diseño
+CLI: bloques 8000, cola de audio sin límite y callback que no procesa su estado
+de error. No tiene botón de pausa de escucha ni medidor. No atribuirle los controles
+del panel. Ambos usan GRAMATICA y validación textual sin umbral acústico.
 
-| ID | Decisión | Motivo | Alternativa descartada |
+## Decisiones técnicas
+
+Python 3.12.10 constatado, dependencias declaradas en requirements-bittle.txt.
+Sin base de datos ni persistencia de eventos. El HTML necesita servidor, no funciona
+como archivo autónomo ni como servicio accesible desde un móvil por la red.
+El código no usa PetoiRobot ni requiere instalar OpenCat como biblioteca Python;
+el firmware compatible del robot sigue siendo necesario.
+
+## Alcance final y posibles ampliaciones
+
+La línea base es H1 v0.4. Inglés, consultas habladas, confianza y registro persistente
+no se prometen en esta entrega. Podrían añadirse en otra versión. Caracterizar
+rendimiento/fallos o mejorar la gestión de enlace no convierte esos resultados en
+mediciones ya hechas. Ver tareas y decisiones para el alcance aprobado por el usuario.
+
+## Contexto técnico y comprobación de principios
+
+Plataforma: Windows, Python 3.12.10; tipo: CLI y panel local; almacenamiento: RAM.
+Dependencias: requirements-bittle.txt; pruebas: pytest mediante requirements.txt.
+Un operador y una sesión de transporte; varios navegadores comparten la misma sesión.
+No hay objetivo acústico medido impuesto por esta revisión. Capacidad de cola, audio y
+eventos se especifica en ACT-05/10/11. Principios .specify: se conserva historia, no se
+opera hardware, no se publica, y se registran riesgos. Los límites físicos y asuntos académicos
+se conservan en el cierre de H4 con la evidencia disponible; no se exige repetir ensayos físicos. La aceptación académica no se presume.
+
+## Integración progresiva
+
+| Incremento | Dependencias | Resultado verificable | Tareas |
 |---|---|---|---|
-| D-01 | Python | RD-01 | — |
-| D-02 | Vosk con modelos locales ES/EN, cargados por ruta | RD-02, RR-03 | Reconocimiento en la nube |
-| D-03 | Confianza por orden = mínimo de confianza por palabra de Vosk | Hace posible comparar con U (pendiente de OPEN-03/04) | Umbral por probabilidad global |
-| D-04 | Bluetooth tratado como puerto serie (pyserial) | Permite probar con `FakeSerial` | API de Petoi con repositorio OpenCat completo |
-| D-05 | Solo los tokens `ksit` y `kup`; el enlace rechaza cualquier otro | RS-01 | Comandos de bajo nivel por articulación |
-| D-06 | Consola mínima sobre el controlador y modelo de vista | RU-03, RI-05…07; el modelo se prueba sin pantalla | Ventana gráfica aplazada |
-| D-07 | Voz de salida con el motor del sistema operativo (por elegir) | Altavoz del ordenador | Voz pregrabada |
-| D-08 | Estado de movimiento con 4 estados y **escucha como indicador aparte** | ESC-07 exige recibir órdenes durante una acción (**desviación** del diseño de 5 estados) | Banderas sueltas |
-| D-09 | Registro en JSON Lines | Fácil de contar en pruebas | Base de datos |
-| D-10 | Vocabulario en fichero | OPEN-06 puede cambiar sin tocar código | Constantes |
-| D-11 | pytest + sustitutos + reloj inyectable | Tiempos deterministas | Solo pruebas manuales |
+| I0 Base documental y entorno | Fuentes Moodle y código recibido | H1, historias, contratos y entorno identificados | T001-T004 |
+| I1 Primer incremento funcional | I0 | Dos órdenes y una no reconocida, parser más adaptador sin robot | T005, T006, T008 |
+| I2 Secuencias | Parser I1 | FIFO, capacidad, cancelación, fallo y cierre | T007 |
+| I3 Captura controlada | I1 | Estados y errores de audio con dobles, sin micrófono real | T009 |
+| I4 Cierre software | I1, I2, I3 | Evidencias, trazabilidad, extracción, commit y ZIP | T010-T013 |
+| I5 Consolidación H4 | Evidencias físicas disponibles y CR-01 | Observado, verificado por software y no comprobado claramente separados | T014-T017 |
 
-## Comprobación de la constitución
+I1 es mínimo y demostrable independientemente de la voz real. El orden expresa
+dependencias técnicas y de esta revisión, no fechas históricas de desarrollo.
+Pruebas por nivel: parser (tokens), controlador (cola/error), interfaz (bytes o tokens
+capturados). Después se ejecuta HTTP local y consola simulada; solo tras ello procede H4.
+La planificación de voz real debe distinguir transcripción correcta de rechazo de no órdenes.
 
-| Principio | Cómo se cumple |
-|---|---|
-| I. Seguridad y comportamiento a prueba de fallos | Lista blanca de tokens; bloqueo sin enlace o con acción en curso; sin reintentos; intervención física independiente (RS-03) |
-| II. Fiabilidad de la voz | Umbral U, idioma activo, vocabulario cerrado, aviso en ≤ T_aviso |
-| III. Trazabilidad y control de versiones | Marcas `caso/req/esc` en cada prueba y `evidencias/trazabilidad_H3.md` con el commit |
-| IV. Verificabilidad | Suite automática sin robot (recuento vigente en evidencias/resultados_H3.md); casos físicos definidos en `docs/H3/casos_de_prueba.md` |
-| V. Diseño modular | Un módulo por responsabilidad; interfaces `Recognizer` y `SerialPort` |
-| VI. Gestión explícita de la incertidumbre | Tabla de OPEN en spec.md §5; valores provisionales marcados |
+## Estructura y decisiones vinculadas
 
-## Riesgos
+Raíz: bittle_voz.py y bittle_web.py; vista: web/index.html; pruebas: tests/unit/;
+documentación: docs/h1/, specs/001-voice-bittle-spec/, docs/H3/; evidencias: evidencias/actual/.
+DF-01 idioma y vocabulario → ACT-03/04/09, T005/T009; DF-03 cola → ACT-05/06/07/08,
+T007; transporte → ACT-02/13/15, T006/T008; panel local → ACT-01/11/14, T006;
+reproducibilidad → ACT-16, T010-T013. Alternativas y fuentes en research.md.
+La guía [quickstart.md](quickstart.md) define el recorrido de validación y remite a GUIA.md.
 
-| Riesgo | Efecto | Mitigación |
-|---|---|---|
-| Vosk no da confianza utilizable | No se puede aplicar U | Ensayo Vosk pendiente; replantear criterio |
-| Latencia Bluetooth > 3 s | Incumple RR-02 | Medir en TEST-F06 |
-| Modelo de Bittle distinto del supuesto | Comandos o postura inesperados | Verificar en T037 histórico (OPEN-02) |
-| Movimiento inesperado en el ensayo | Daño a personas o al robot | OPEN-09 antes de cualquier ensayo; RO-01 |
-| `kup` desde sentado falla | ESC-02 incompleto | TEST-F03; documentar alternativa |
-| Terminador del comando serie incorrecto | El robot ignora órdenes | `EnlaceBittle(terminador=…)` configurable; confirmar antes de H4 |
+## Estrategia operativa de voz
 
-## Estructura del repositorio
+La estrategia de uso elegida por el equipo mantiene el micrófono apagado salvo al
+dictar instrucciones desde el panel. Tras aceptar una orden o secuencia, se desactiva
+manualmente la escucha; la cola continúa. PARA se pulsa en pantalla cuando no se escucha.
+No hay silenciamiento automático ni confirmación previa: las acciones pueden comenzar
+al aceptarse. Persiste la posibilidad de transcripción errónea con escucha activa.
+OPEN-03 documenta una limitación conocida con mitigación operativa, no una corrección
+software pendiente. El ensayo fallido de conversación se conserva como tal.
 
-```
-docs/h1/H1_v0.2.pdf        H1 vigente
-specs/001-voice-bittle-spec/   spec, plan, tasks, research, data-model, contracts, quickstart, checklists
-docs/H3/casos_de_prueba.md     casos automáticos y físicos
-src/  tests/  tools/           código, pruebas, generador de evidencias
-evidencias/                    resultados y trazabilidad (generados)
-```
-
-## Integración implementada y condiciones de H4
-
-`voice_bittle.py` → `app/consola.py` compone módulos existentes. La simulación
-es el modo predeterminado. Vosk puede alimentar FakeSerial mediante `/capturar`.
-El transporte `PuertoSerieReal` no abre al construirse; requiere PerfilFisico
-completo, referencias de aprobación y habilitación expresa por sesión. La consola
-física solo informa bloqueos: no tiene aún un flujo operativo aprobado que abra puertos.
-
-Reconexión y fin de acción física sin evidencia mantienen estado desconocido.
-No se implementan reintentos automáticos ni comandos adicionales.
-`is_open` solo refleja el recurso local: no acredita conectividad Bluetooth extremo a extremo.
-Un supervisor periódico independiente de la captura y un mecanismo de detección física
-aplicable al hardware deben validarse antes de habilitar un bucle de operación real.
-
-D-03 (mínimo de confianza), D-07 (TTS), OPEN-04/09/12/14/15 siguen pendientes;
-las pruebas con dobles no aprueban estas decisiones. Ver decision-log.md.
-
-Nota de revisión final: captura Vosk nueva por petición, solo resultados finales con palabras coherentes; silencio PCM nulo descartado; identidad y caducidad por captura. Confianza mínima por palabra experimental, no calibrada. Ver docs/H3/ENTREGA_COMPANEROS.md.

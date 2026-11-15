@@ -1,10 +1,30 @@
 {
-  "commit_base": "e3c0ba25ebf6744c25f5f815b714427c64d02da5",
   "proyecto": "VOICE-BITTLE ARGOS",
-  "fases": [
-    "H1",
-    "H2",
-    "H3"
+  "revision_documental": "0.11",
+  "fecha": "2026-11-13",
+  "commit_base": "2e69669b362b11b8729f63341e49d9229371ce10",
+  "aplicacion_actual": [
+    "bittle_web.py",
+    "bittle_voz.py",
+    "web/index.html"
   ],
-  "hardware": "pendiente, modo físico bloqueado"
+  "hardware": "Ensayos físicos nominales ya realizados y consolidados; no habrá más. Correcciones finales no revalidadas físicamente.",
+  "spec_kit": "recursos recuperados; tareas y prerrequisitos ejecutados en consolidacion 2026-11-13",
+  "h1_vigente": "docs/h1/H1_v0.4.md",
+  "h1_pdf": "docs/h1/H1_v0.4.pdf",
+  "alcance": "entrega final limpia: español, cola, PARA y panel",
+  "pruebas_aplicacion_final": 49,
+  "nota_commit": "Commit de fuentes y evidencias de las correcciones finales; metadatos de empaquetado posteriores. No es la versión física ensayada.",
+  "cr01": "Cola con PARA: elegida por equipo, implementada y verificada; aceptación académica pendiente",
+  "voz_no_orden": "Falsos positivos reproducidos en simulación; decisión del equipo: mantener software y micrófono apagado salvo dictado, desactivación manual tras aceptación. Limitación con escucha activa conservada; sin corrección software planificada",
+  "version_fisica": {
+    "commit_exacto": "no determinable: no registrado en sesión",
+    "referencia_comparativa": "b63ef45, código anterior; no acredita commit ejecutado",
+    "sha256_referencia": {
+      "bittle_voz.py": "d6e83dc2863c38a5a9e40ed978be068b10ff8eb6d011d321c3b818a7df218429",
+      "bittle_web.py": "84caecd9b08621ac5d1f8478335d76fc2e173e6a57a6e061a0f64de83d032bdc",
+      "web/index.html": "182c1e263570de33c2fec23d48092a5e3a8bbc9ff1efa98b5ed2f8387cd0a248"
+    }
+  },
+  "correcciones_finales": "Serie sin reenvío automático, resultado incierto preservado, recuperación manual sin cola anterior, descarte de movimientos tras fallo y validación de entradas Vosk"
 }

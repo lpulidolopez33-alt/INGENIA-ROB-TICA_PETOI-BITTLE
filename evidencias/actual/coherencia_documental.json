@@ -1,0 +1,9 @@
+{
+  "documentos_con_enlaces_revisados": 35,
+  "linea_base_vigente": "H1 v0.4",
+  "requisitos_H1_vigentes": 16,
+  "requisitos_H1_v02_con_tratamiento_historico": 34,
+  "requisitos_actuales": 16,
+  "fallos": [],
+  "limite": "comprobacion estructural y de integridad; no prueba ausencia absoluta de defectos semanticos"
+}

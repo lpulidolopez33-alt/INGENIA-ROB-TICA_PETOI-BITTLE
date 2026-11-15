@@ -1,0 +1,27 @@
+{
+  "fecha": "2026-11-13",
+  "zip_sha256": "1556dce14a01feb81df25c64f29d265b86e4869d30bf248d2f9ccc9c603d3661",
+  "archivos": 94,
+  "manifiesto": "PASS",
+  "suite": "...............................                                          [100%]\n31 passed in 1.79s",
+  "cli_tokens": [
+    "ksit",
+    "kup",
+    "ksit",
+    "krest",
+    "krest"
+  ],
+  "cli_salida": "Órdenes: siéntate, de pie/levántate, camina/adelante, corre, atrás, izquierda, derecha, saluda/hola, flexiones, estira, descansa, BAILA, PARA/quieto\nPuedes encadenar órdenes con 'y después'. PARA cancela toda la cola.\n\n⌨  Modo texto: escribe la orden y pulsa Enter (Ctrl+C para salir)\n\n> 🗣  «siéntate y ponte de pie y siéntate y descansa» -> sentarse → ponerse de pie → sentarse → descansar (servos relajados)\n   En cola: 4 acción(es) pendientes\n>    ▶ Ejecutando: sentarse (ksit)\n   [SIMULADO] se enviaría: 'ksit'\n   ▶ Ejecutando: ponerse de pie (kup)\n   [SIMULADO] se enviaría: 'kup'\n   ▶ Ejecutando: sentarse (ksit)\n   [SIMULADO] se enviaría: 'ksit'\n   ▶ Ejecutando: descansar (servos relajados) (krest)\n   [SIMULADO] se enviaría: 'krest'\n\nSaliendo...\n   [SIMULADO] se enviaría: 'krest'\n",
+  "coherencia": {
+    "documentos_con_enlaces_revisados": 34,
+    "linea_base_vigente": "H1 v0.4",
+    "requisitos_H1_vigentes": 16,
+    "requisitos_H1_v02_con_tratamiento_historico": 34,
+    "requisitos_actuales": 16,
+    "fallos": [],
+    "limite": "comprobacion estructural y de integridad; no prueba ausencia absoluta de defectos semanticos"
+  },
+  "limite": "Copia limpia del proyecto con entorno Python de pruebas ya instalado; no instalación desde cero ni audio/robot real.",
+  "alcance": "Ensayo del paquete candidato antes de añadir este registro y cerrar T013; la auditoría externa identifica el ZIP final sin autorreferencia.",
+  "clasificacion": "HISTORICA: resultado anterior, no describe la versión definitiva"
+}

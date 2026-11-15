@@ -1,16 +1,16 @@
-# Revisión de alineación — 2026-11-12
+# Revisión de calidad de requisitos
 
-- [x] Referencia H1 v0.2: 13 escenarios, 7 necesidades, 34 requisitos, 15 OPEN.
-- [x] Cuatro intenciones ES/EN; consultas sin comandos.
-- [x] Matriz H1 §6.1 transcrita sin inventar equivalencias REQ/RNF.
-- [x] T001–T050 históricos preservados; renumeración de otra rama no adoptada.
-- [x] Pruebas con métodos y límites; manifiesto de código ejecutado.
-- [x] Guía de simulación, configuración de modelos y ensayo manual.
-- [ ] Revisión formal de spec/plan/constitución y decisiones por el equipo.
-- [ ] Validación de Vosk ES/EN con audio y sin Internet (OPEN-03).
-- [ ] U, tiempos y condiciones de ensayo aprobados (OPEN-04/05/12/13).
-- [ ] Hardware, protocolo y Bluetooth identificados (OPEN-02/10/15).
-- [ ] Procedimiento independiente, estados físicos y cierre aprobados (OPEN-09/14).
-- [ ] Metadatos H1 completos (OPEN-08).
+Revisión 13/11/2026, H1 v0.4. Esta lista evalúa documentos, no aprobación académica.
 
-Una marca de documentación revisada no acredita cumplimiento del requisito.
+- [x] Alcance, actores, condiciones, fuentes y límites definidos.
+- [x] Escenarios nominales y excepcionales con fichas y variantes.
+- [x] Necesidades con origen, actor, justificación y prioridad.
+- [x] 16 ACT con enunciado, motivación, clase, método y estado.
+- [x] Historias y primer incremento verificables sin robot.
+- [x] Tareas con dependencias y criterios, vinculadas a ACT y componentes.
+- [x] Riesgos externos con impacto, acción, responsable organizativo y estado.
+- [x] Evolución de alcance sin atribuir aprobaciones ni ensayos inexistentes.
+
+Aceptación académica y H4 no son criterios satisfechos por esta lista: siguen en
+docs/h1/ASUNTOS_ABIERTOS.md y docs/H3/CIERRE_Y_H4.md. La verificación automática
+de referencias se ejecuta por separado; no acredita ausencia absoluta de defectos.

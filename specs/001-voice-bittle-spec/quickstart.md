@@ -1,17 +1,15 @@
-# Validación rápida H3
+# Validación del primer incremento y de la entrega
 
-Desde la raíz del checkout, PowerShell:
+Instalación única según [GUIA.md](../../GUIA.md), incluyendo requirements.txt para pruebas.
+Desde la raíz ejecutar `python -m pytest -q`. La suite usa sustitutos de hardware.
+Ejecutar `python bittle_voz.py --simulado --texto` y escribir siéntate, esperar su envío,
+después ponte de pie; finalmente siéntate y vuela. Deben observarse ksit y kup, y rechazo
+sin nuevo comando para la tercera frase. Ctrl+C intenta krest al cerrar.
 
-```powershell
-.\.venv\Scripts\python.exe voice_bittle.py --demo
-.\.venv\Scripts\python.exe -m pytest -q
-.\.venv\Scripts\python.exe tools/generar_evidencias.py
-```
+Panel: `python bittle_web.py`; elegir Simulación, Conectar y repetir. PARA debe cancelar
+pendientes. No activar el micrófono para esta prueba. La prueba con voz necesita modelo y
+micrófono reales y se registra aparte. Ver [casos](../../docs/H3/casos_actuales.md).
 
-Instalación y modelos: [GUIA.md](../../GUIA.md). Recuento ejecutado y huella:
-[evidencias](../../evidencias/resultados_H3.md). No confundir casos con pruebas
-parametrizadas. Los PASS son de lógica, simulación, dobles o inspección.
-`--reconocedor vosk` usa audio real con transporte simulado; ensayo manual en la guía.
-`--modo fisico` sale bloqueado, código 2. No sustituir componentes para saltarse
-[preprueba_fisica.md](../../docs/H3/preprueba_fisica.md).
-RR-01/02/03, RF-03 y RS-03 siguen pendientes de validación real según su alcance.
+Empaquetado y verificación: tools/generar_evidencias_actuales.py,
+tools/verificar_documentacion.py y tools/empaquetar.py. Consultar resultados y versión
+antes de declarar aceptación. Las copias extraídas no contienen entorno, modelo ni .git.

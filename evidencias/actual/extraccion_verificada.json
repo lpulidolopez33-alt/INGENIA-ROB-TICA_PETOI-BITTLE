@@ -1,0 +1,28 @@
+{
+  "estado": "PASS",
+  "zip_sha256": "bcf2f0105907351272887638dda49bacdfd143473197ffa856a67e98394459a2",
+  "archivos": 99,
+  "hashes_verificados": 98,
+  "pruebas": 49,
+  "suite": ".................................................                        [100%]\n49 passed in 2.72s",
+  "cli_tokens": [
+    "ksit",
+    "kup",
+    "ksit",
+    "krest",
+    "krest"
+  ],
+  "simulacion": "Órdenes: siéntate, de pie/levántate, camina/adelante, corre, atrás, izquierda, derecha, saluda/hola, flexiones, estira, descansa, BAILA, PARA/quieto\nPuedes encadenar órdenes con 'y después'. PARA cancela toda la cola.\n\n⌨  Modo texto: escribe la orden y pulsa Enter (Ctrl+C para salir)\n\n> 🗣  «siéntate y ponte de pie y siéntate y descansa» -> sentarse → ponerse de pie → sentarse → descansar (servos relajados)\n   En cola: 4 acción(es) pendientes\n>    ▶ Ejecutando: sentarse (ksit)\n   [SIMULADO] se enviaría: 'ksit'\n   ▶ Ejecutando: ponerse de pie (kup)\n   [SIMULADO] se enviaría: 'kup'\n   ▶ Ejecutando: sentarse (ksit)\n   [SIMULADO] se enviaría: 'ksit'\n   ▶ Ejecutando: descansar (servos relajados) (krest)\n   [SIMULADO] se enviaría: 'krest'\n\nSaliendo...\n   [SIMULADO] se enviaría: 'krest'\n",
+  "coherencia": {
+    "documentos_con_enlaces_revisados": 35,
+    "linea_base_vigente": "H1 v0.4",
+    "requisitos_H1_vigentes": 16,
+    "requisitos_H1_v02_con_tratamiento_historico": 34,
+    "requisitos_actuales": 16,
+    "fallos": [],
+    "limite": "comprobacion estructural y de integridad; no prueba ausencia absoluta de defectos semanticos"
+  },
+  "http": "Verificado en suite: página, API y arranque sin hardware ni envíos",
+  "limite": "Extracción independiente con dependencias ya instaladas; sin micrófono ni COM reales; no revalidación física",
+  "alcance": "Candidato previo al registro de extracción y metadatos finales. Mismos fuentes de ejecución; informe externo AUDITORIA_CIERRE_DEFINITIVO.json verifica el ZIP definitivo sin autorreferencia."
+}

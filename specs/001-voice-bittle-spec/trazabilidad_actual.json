@@ -1,0 +1,448 @@
+[
+  {
+    "id": "ACT-01",
+    "codigo": [
+      "bittle_web.py",
+      "web/index.html"
+    ],
+    "pruebas": [
+      "tests/unit/test_panel_web.py::test_arranque_sin_conexion_ni_escucha",
+      "tests/unit/test_cierre_final.py::test_arranque_http_no_abre_hardware_ni_transmite"
+    ],
+    "limites": "Arranque software, no disponibilidad física.",
+    "necesidades": [
+      "NF-04",
+      "NF-05"
+    ],
+    "escenarios": [
+      "EF-01"
+    ],
+    "tareas": [
+      "T006"
+    ],
+    "fuentes": [
+      "REF-11",
+      "REF-12"
+    ]
+  },
+  {
+    "id": "ACT-02",
+    "codigo": [
+      "bittle_web.py",
+      "bittle_voz.py"
+    ],
+    "pruebas": [
+      "tests/unit/test_panel_web.py::test_simulacion_cola_y_desconexion",
+      "tests/unit/test_panel_web.py::test_error_conexion_restaura_estado",
+      "tests/unit/test_contratos_moodle.py::test_dos_ordenes_y_desconocida_por_http",
+      "tests/unit/test_contratos_moodle.py::test_formato_serie_ascii_lf_sin_puerto",
+      "tests/unit/test_cierre_final.py::test_fallo_previo_no_escribe_y_recuperacion_es_explicita"
+    ],
+    "limites": "COM real comunicado por usuario, no simulado como robot completo.",
+    "necesidades": [
+      "NF-01",
+      "NF-05"
+    ],
+    "escenarios": [
+      "EF-01",
+      "EF-10"
+    ],
+    "tareas": [
+      "T006",
+      "T008"
+    ],
+    "fuentes": [
+      "REF-11",
+      "REF-12"
+    ]
+  },
+  {
+    "id": "ACT-03",
+    "codigo": [
+      "bittle_voz.py"
+    ],
+    "pruebas": [
+      "tests/unit/test_cola_bittle_voz.py::test_interpretacion",
+      "tests/unit/test_cola_bittle_voz.py::test_fifo_frases_separadas_y_repeticiones",
+      "tests/unit/test_contratos_moodle.py::test_dos_ordenes_y_desconocida_por_http"
+    ],
+    "limites": "Parser textual, no precisión acústica ni todos los alias.",
+    "necesidades": [
+      "NF-01"
+    ],
+    "escenarios": [
+      "EF-02",
+      "EF-09"
+    ],
+    "tareas": [
+      "T005",
+      "T008"
+    ],
+    "fuentes": [
+      "REF-01",
+      "REF-02",
+      "REF-12"
+    ]
+  },
+  {
+    "id": "ACT-04",
+    "codigo": [
+      "bittle_voz.py"
+    ],
+    "pruebas": [
+      "tests/unit/test_cola_bittle_voz.py::test_interpretacion",
+      "tests/unit/test_contratos_moodle.py::test_dos_ordenes_y_desconocida_por_http",
+      "tests/unit/test_cierre_final.py::test_resultado_vosk_vacio_invalido_no_es_orden"
+    ],
+    "limites": "Desconocidas/negación textual; no garantiza rechazo de audio ruidoso.",
+    "necesidades": [
+      "NF-01"
+    ],
+    "escenarios": [
+      "EF-02",
+      "EF-07",
+      "EF-09"
+    ],
+    "tareas": [
+      "T005",
+      "T008"
+    ],
+    "fuentes": [
+      "REF-01",
+      "REF-02",
+      "REF-12"
+    ]
+  },
+  {
+    "id": "ACT-05",
+    "codigo": [
+      "bittle_voz.py"
+    ],
+    "pruebas": [
+      "tests/unit/test_cola_bittle_voz.py::test_fifo_frases_separadas_y_repeticiones",
+      "tests/unit/test_cola_bittle_voz.py::test_limite_rechaza_frase_entera"
+    ],
+    "limites": "Capacidad y FIFO con sustituto; sin prueba exhaustiva de carreras concurrentes.",
+    "necesidades": [
+      "NF-02"
+    ],
+    "escenarios": [
+      "EF-03",
+      "EF-04"
+    ],
+    "tareas": [
+      "T007"
+    ],
+    "fuentes": [
+      "REF-11",
+      "REF-12"
+    ]
+  },
+  {
+    "id": "ACT-06",
+    "codigo": [
+      "bittle_voz.py"
+    ],
+    "pruebas": [
+      "tests/unit/test_cola_bittle_voz.py::test_fifo_frases_separadas_y_repeticiones",
+      "tests/unit/test_contratos_moodle.py::test_esperas_minimas_y_parametro_invalido"
+    ],
+    "limites": "Esperas mínimas y parámetros inválidos probados; no medición de finalización física.",
+    "necesidades": [
+      "NF-02"
+    ],
+    "escenarios": [
+      "EF-03"
+    ],
+    "tareas": [
+      "T007"
+    ],
+    "fuentes": [
+      "REF-11",
+      "REF-12"
+    ]
+  },
+  {
+    "id": "ACT-07",
+    "codigo": [
+      "bittle_voz.py"
+    ],
+    "pruebas": [
+      "tests/unit/test_cola_bittle_voz.py::test_caminar_tiene_fin_temporizado",
+      "tests/unit/test_cola_bittle_voz.py::test_coreografia_completa_antes_de_siguiente"
+    ],
+    "limites": "Coreografía reducida de prueba; no valida movimientos reales del baile/Cristiano.",
+    "necesidades": [
+      "NF-02"
+    ],
+    "escenarios": [
+      "EF-03"
+    ],
+    "tareas": [
+      "T007"
+    ],
+    "fuentes": [
+      "REF-11",
+      "REF-12"
+    ]
+  },
+  {
+    "id": "ACT-08",
+    "codigo": [
+      "bittle_voz.py",
+      "bittle_web.py"
+    ],
+    "pruebas": [
+      "tests/unit/test_cola_bittle_voz.py::test_parada_cancela_espera_y_pendientes",
+      "tests/unit/test_cola_bittle_voz.py::test_parada_corta_coreografia",
+      "tests/unit/test_panel_web.py::test_parada_visible_descarta_pendientes",
+      "tests/unit/test_contratos_moodle.py::test_parada_preservada_durante_error",
+      "tests/unit/test_cierre_final.py::test_cancelacion_antes_de_seleccionar_envio_no_ejecuta_orden",
+      "tests/unit/test_cierre_final.py::test_fallo_con_parada_no_conserva_movimientos_añadidos"
+    ],
+    "limites": "No interrupción del I/O en curso ni garantía de parada física.",
+    "necesidades": [
+      "NF-03"
+    ],
+    "escenarios": [
+      "EF-05",
+      "EF-09"
+    ],
+    "tareas": [
+      "T007",
+      "T008"
+    ],
+    "fuentes": [
+      "REF-11",
+      "REF-12"
+    ]
+  },
+  {
+    "id": "ACT-09",
+    "codigo": [
+      "bittle_web.py"
+    ],
+    "pruebas": [
+      "tests/unit/test_panel_web.py::test_apagar_durante_carga_no_abre_captura",
+      "tests/unit/test_panel_web.py::test_resultado_tardio_no_se_encola_al_apagar",
+      "tests/unit/test_cierre_final.py::test_audio_invalido_no_envia_y_nueva_activacion_no_reutiliza"
+    ],
+    "limites": "Carga/captura con sustitutos; uso nominal comunicado por usuario.",
+    "necesidades": [
+      "NF-04"
+    ],
+    "escenarios": [
+      "EF-06",
+      "EF-11"
+    ],
+    "tareas": [
+      "T009"
+    ],
+    "fuentes": [
+      "REF-11",
+      "REF-12"
+    ]
+  },
+  {
+    "id": "ACT-10",
+    "codigo": [
+      "bittle_web.py"
+    ],
+    "pruebas": [
+      "tests/unit/test_panel_web.py::test_modelo_ausente_no_activa_microfono",
+      "tests/unit/test_panel_web.py::test_microfono_informa_error_de_apertura",
+      "tests/unit/test_contratos_moodle.py::test_audio_saturado_apaga_sin_aceptar_orden"
+    ],
+    "limites": "Errores de apertura/modelo y saturación probados con dobles; no captura real.",
+    "necesidades": [
+      "NF-04"
+    ],
+    "escenarios": [
+      "EF-06",
+      "EF-07",
+      "EF-11"
+    ],
+    "tareas": [
+      "T009"
+    ],
+    "fuentes": [
+      "REF-11",
+      "REF-12"
+    ]
+  },
+  {
+    "id": "ACT-11",
+    "codigo": [
+      "bittle_web.py",
+      "web/index.html"
+    ],
+    "pruebas": [
+      "tests/unit/test_panel_web.py::test_http_pagina_estado_y_proteccion_de_acciones",
+      "tests/unit/test_contratos_moodle.py::test_eventos_limitados_conservan_mas_recientes"
+    ],
+    "limites": "HTTP y límite de 40 eventos probados; medidor y disposición por inspección, no telemetría física.",
+    "necesidades": [
+      "NF-04",
+      "NF-06"
+    ],
+    "escenarios": [
+      "EF-02",
+      "EF-06"
+    ],
+    "tareas": [
+      "T006",
+      "T009"
+    ],
+    "fuentes": [
+      "REF-11",
+      "REF-12"
+    ]
+  },
+  {
+    "id": "ACT-12",
+    "codigo": [
+      "bittle_web.py",
+      "bittle_voz.py"
+    ],
+    "pruebas": [
+      "tests/unit/test_cola_bittle_voz.py::test_cierre_descarta_pendientes_y_termina_hilo",
+      "tests/unit/test_panel_web.py::test_simulacion_cola_y_desconexion",
+      "tests/unit/test_contratos_moodle.py::test_dos_ordenes_y_desconocida_por_http",
+      "tests/unit/test_cierre_final.py::test_fallo_serie_descarta_cola_y_no_transmite_al_cerrar"
+    ],
+    "limites": "Fin del hilo/cola, no reposo físico; efecto de cerrar pestaña por inspección.",
+    "necesidades": [
+      "NF-03"
+    ],
+    "escenarios": [
+      "EF-08"
+    ],
+    "tareas": [
+      "T006",
+      "T007"
+    ],
+    "fuentes": [
+      "REF-11",
+      "REF-12"
+    ]
+  },
+  {
+    "id": "ACT-13",
+    "codigo": [
+      "bittle_voz.py",
+      "bittle_web.py"
+    ],
+    "pruebas": [
+      "tests/unit/test_cola_bittle_voz.py::test_error_descarta_secuencia",
+      "tests/unit/test_contratos_moodle.py::test_parada_preservada_durante_error",
+      "tests/unit/test_cierre_final.py::test_envio_incierto_no_repite_y_conserva_resultado",
+      "tests/unit/test_cierre_final.py::test_fallo_previo_no_escribe_y_recuperacion_es_explicita",
+      "tests/unit/test_cierre_final.py::test_fallo_con_parada_no_conserva_movimientos_añadidos"
+    ],
+    "limites": "Sin reenvío y recuperación manual comprobados con puerto falso; resultado físico desconocido, corrección no revalidada en Bittle.",
+    "necesidades": [
+      "NF-03"
+    ],
+    "escenarios": [
+      "EF-05",
+      "EF-07",
+      "EF-10"
+    ],
+    "tareas": [
+      "T007",
+      "T008"
+    ],
+    "fuentes": [
+      "REF-11",
+      "REF-12"
+    ]
+  },
+  {
+    "id": "ACT-14",
+    "codigo": [
+      "bittle_web.py"
+    ],
+    "pruebas": [
+      "tests/unit/test_panel_web.py::test_http_pagina_estado_y_proteccion_de_acciones"
+    ],
+    "limites": "Token/origen probados; Host/límite cuerpo/bind inspeccionados, no auditoría de seguridad completa.",
+    "necesidades": [
+      "NF-05"
+    ],
+    "escenarios": [
+      "EF-01"
+    ],
+    "tareas": [
+      "T006",
+      "T008"
+    ],
+    "fuentes": [
+      "REF-11",
+      "REF-12"
+    ]
+  },
+  {
+    "id": "ACT-15",
+    "codigo": [
+      "bittle_voz.py",
+      "bittle_web.py"
+    ],
+    "pruebas": [],
+    "limites": "Inspección de CLI/captura/BLE; sin pruebas físicas BLE ni todos los fallos del CLI.",
+    "necesidades": [
+      "NF-01",
+      "NF-05"
+    ],
+    "escenarios": [
+      "EF-02"
+    ],
+    "tareas": [
+      "T005",
+      "T006"
+    ],
+    "fuentes": [
+      "REF-11",
+      "REF-12"
+    ]
+  },
+  {
+    "id": "ACT-16",
+    "codigo": [
+      "tools/generar_evidencias_actuales.py",
+      "tools/verificar_documentacion.py"
+    ],
+    "pruebas": [],
+    "limites": "Ejecución de herramientas y revisión documental; no aceptación formal de H1.",
+    "necesidades": [
+      "NF-06"
+    ],
+    "escenarios": [
+      "EF-01",
+      "EF-02",
+      "EF-03",
+      "EF-04",
+      "EF-05",
+      "EF-06",
+      "EF-07",
+      "EF-08",
+      "EF-09",
+      "EF-10",
+      "EF-11"
+    ],
+    "tareas": [
+      "T001",
+      "T002",
+      "T003",
+      "T004",
+      "T010",
+      "T011",
+      "T012",
+      "T013"
+    ],
+    "fuentes": [
+      "REF-01",
+      "REF-02",
+      "REF-12"
+    ]
+  }
+]
