@@ -1,0 +1,305 @@
+[
+  {
+    "id": "T001",
+    "fase": "Base",
+    "historia": null,
+    "dependencias": [],
+    "requisitos": [
+      "ACT-16"
+    ],
+    "objetivo": "Preservar antecedentes e identificar equipo y fuentes",
+    "archivo": "docs/EQUIPO.md",
+    "criterio": "Nombres confirmados y fuentes localizadas; originales recuperables en Git",
+    "estado": "Hecho",
+    "responsable": "Equipo ARGOS; reparto individual por confirmar"
+  },
+  {
+    "id": "T002",
+    "fase": "Base",
+    "historia": null,
+    "dependencias": [
+      "T001"
+    ],
+    "requisitos": [
+      "ACT-16"
+    ],
+    "objetivo": "Completar H1 y fichas docentes",
+    "archivo": "docs/h1/H1_v0.4.md",
+    "criterio": "11 escenarios, 6 necesidades y 16 requisitos con fuentes, método y riesgos",
+    "estado": "Hecho",
+    "responsable": "Equipo ARGOS; reparto individual por confirmar"
+  },
+  {
+    "id": "T003",
+    "fase": "Base",
+    "historia": null,
+    "dependencias": [
+      "T002"
+    ],
+    "requisitos": [
+      "ACT-16"
+    ],
+    "objetivo": "Revisar especificación, arquitectura y contratos",
+    "archivo": "specs/001-voice-bittle-spec/plan.md",
+    "criterio": "Historias, primer incremento, interfaces y estrategia de integración identificados",
+    "estado": "Hecho",
+    "responsable": "Equipo ARGOS; reparto individual por confirmar"
+  },
+  {
+    "id": "T004",
+    "fase": "Base",
+    "historia": null,
+    "dependencias": [
+      "T003"
+    ],
+    "requisitos": [
+      "ACT-16"
+    ],
+    "objetivo": "Generar tareas y relaciones con Spec Kit",
+    "archivo": "specs/001-voice-bittle-spec/tasks.md",
+    "criterio": "Tareas con dependencias, criterio, componente y requisitos; ninguna referencia huérfana",
+    "estado": "Hecho",
+    "responsable": "Equipo ARGOS; reparto individual por confirmar"
+  },
+  {
+    "id": "T005",
+    "fase": "I1",
+    "historia": "US1",
+    "dependencias": [
+      "T004"
+    ],
+    "requisitos": [
+      "ACT-03",
+      "ACT-04",
+      "ACT-15"
+    ],
+    "objetivo": "Verificar interpretación de dos órdenes y entrada desconocida",
+    "archivo": "tests/unit/test_cola_bittle_voz.py",
+    "criterio": "ksit/kup en orden; desconocida rechaza lote; CLI disponible sin hardware",
+    "estado": "Hecho",
+    "responsable": "Equipo ARGOS; reparto individual por confirmar"
+  },
+  {
+    "id": "T006",
+    "fase": "I1",
+    "historia": "US1",
+    "dependencias": [
+      "T005"
+    ],
+    "requisitos": [
+      "ACT-01",
+      "ACT-02",
+      "ACT-11",
+      "ACT-12",
+      "ACT-14",
+      "ACT-15"
+    ],
+    "objetivo": "Verificar sesión, panel y cierre",
+    "archivo": "tests/unit/test_panel_web.py",
+    "criterio": "Inicio apagado, sesión simulada, protección HTTP y desconexión comprobados",
+    "estado": "Hecho",
+    "responsable": "Equipo ARGOS; reparto individual por confirmar"
+  },
+  {
+    "id": "T007",
+    "fase": "I2",
+    "historia": "US2",
+    "dependencias": [
+      "T005"
+    ],
+    "requisitos": [
+      "ACT-05",
+      "ACT-06",
+      "ACT-07",
+      "ACT-08",
+      "ACT-12",
+      "ACT-13"
+    ],
+    "objetivo": "Verificar cola, tiempos, cancelación y error concurrente",
+    "archivo": "tests/unit/test_contratos_moodle.py",
+    "criterio": "FIFO/límite, mínimos y PARA tras fallo pasan pruebas; no implica parada física",
+    "estado": "Hecho",
+    "responsable": "Equipo ARGOS; reparto individual por confirmar"
+  },
+  {
+    "id": "T008",
+    "fase": "I1",
+    "historia": "US1",
+    "dependencias": [
+      "T006",
+      "T007"
+    ],
+    "requisitos": [
+      "ACT-02",
+      "ACT-03",
+      "ACT-04",
+      "ACT-08",
+      "ACT-13",
+      "ACT-14"
+    ],
+    "objetivo": "Añadir recorrido de aceptación HTTP y adaptación serie",
+    "archivo": "tests/unit/test_contratos_moodle.py",
+    "criterio": "Dos órdenes por API producen tokens; desconocida HTTP 400 no añade nada; bytes ASCII+LF correctos",
+    "estado": "Hecho",
+    "responsable": "Equipo ARGOS; reparto individual por confirmar"
+  },
+  {
+    "id": "T009",
+    "fase": "I3",
+    "historia": "US3",
+    "dependencias": [
+      "T006"
+    ],
+    "requisitos": [
+      "ACT-09",
+      "ACT-10",
+      "ACT-11"
+    ],
+    "objetivo": "Verificar captura cancelable, saturación y eventos",
+    "archivo": "tests/unit/test_contratos_moodle.py",
+    "criterio": "Dobles de audio, sin dispositivo real: apagado por saturación y últimos 40 eventos",
+    "estado": "Hecho",
+    "responsable": "Equipo ARGOS; reparto individual por confirmar"
+  },
+  {
+    "id": "T010",
+    "fase": "I4",
+    "historia": "US4",
+    "dependencias": [
+      "T007",
+      "T008",
+      "T009"
+    ],
+    "requisitos": [
+      "ACT-16"
+    ],
+    "objetivo": "Regenerar evidencias y trazabilidad",
+    "archivo": "tools/generar_evidencias_actuales.py",
+    "criterio": "Suite completa PASS; matriz escenario-necesidad-ACT-tarea-código-prueba-resultado vigente",
+    "estado": "Hecho",
+    "responsable": "Equipo ARGOS; reparto individual por confirmar"
+  },
+  {
+    "id": "T011",
+    "fase": "I4",
+    "historia": "US4",
+    "dependencias": [
+      "T010"
+    ],
+    "requisitos": [
+      "ACT-16"
+    ],
+    "objetivo": "Revisar coherencia y PDF H1",
+    "archivo": "tools/verificar_documentacion.py",
+    "criterio": "Sin enlaces/trazas rotos; PDF legible y requisitos iguales a spec.md",
+    "estado": "Hecho",
+    "responsable": "Equipo ARGOS; reparto individual por confirmar"
+  },
+  {
+    "id": "T012",
+    "fase": "I4",
+    "historia": "US4",
+    "dependencias": [
+      "T011"
+    ],
+    "requisitos": [
+      "ACT-16"
+    ],
+    "objetivo": "Registrar versión H3 en Git local",
+    "archivo": "VERSION_ENTREGA.json",
+    "criterio": "Commit real de fuentes y evidencias referenciado; sin push ni merge",
+    "estado": "Hecho",
+    "responsable": "Equipo ARGOS; reparto individual por confirmar"
+  },
+  {
+    "id": "T013",
+    "fase": "I4",
+    "historia": "US4",
+    "dependencias": [
+      "T012"
+    ],
+    "requisitos": [
+      "ACT-16"
+    ],
+    "objetivo": "Verificar ZIP desde extracción independiente",
+    "archivo": "tools/empaquetar.py",
+    "criterio": "ZIP íntegro; extracción pasa suite y cuatro acciones simuladas en orden",
+    "estado": "Hecho",
+    "responsable": "Equipo ARGOS; reparto individual por confirmar"
+  },
+  {
+    "id": "T014",
+    "fase": "H4",
+    "historia": null,
+    "dependencias": [
+      "T013"
+    ],
+    "requisitos": [
+      "ACT-03",
+      "ACT-04",
+      "ACT-09",
+      "ACT-10",
+      "ACT-15"
+    ],
+    "objetivo": "Consolidar evidencia de voz y escucha manual",
+    "archivo": "docs/H3/preprueba_fisica.md",
+    "criterio": "Separar observación comunicada, simulación y aspectos sin registro; sin exigir nuevas sesiones ni atribuir revalidación física",
+    "estado": "Cerrada con evidencia disponible y límites; sin nuevos ensayos físicos",
+    "responsable": "Equipo ARGOS; reparto individual por confirmar"
+  },
+  {
+    "id": "T015",
+    "fase": "H4",
+    "historia": null,
+    "dependencias": [
+      "T014"
+    ],
+    "requisitos": [
+      "ACT-02",
+      "ACT-06",
+      "ACT-07",
+      "ACT-08",
+      "ACT-12",
+      "ACT-13",
+      "ACT-15"
+    ],
+    "objetivo": "Consolidar evidencia de Bittle físico y versión utilizada",
+    "archivo": "docs/H3/preprueba_fisica.md",
+    "criterio": "Separar observación comunicada, simulación y aspectos sin registro; sin exigir nuevas sesiones ni atribuir revalidación física",
+    "estado": "Cerrada con evidencia disponible y límites; sin nuevos ensayos físicos",
+    "responsable": "Equipo ARGOS; reparto individual por confirmar"
+  },
+  {
+    "id": "T016",
+    "fase": "H4",
+    "historia": null,
+    "dependencias": [
+      "T013"
+    ],
+    "requisitos": [
+      "ACT-16"
+    ],
+    "objetivo": "Documentar CR-01 elegido por equipo: cola secuencial y PARA",
+    "archivo": "docs/H3/CR-01.md",
+    "criterio": "Origen del equipo, impacto, implementación y regresión documentados; aceptación académica separada en T017",
+    "estado": "Hecho",
+    "responsable": "Equipo ARGOS; reparto individual por confirmar"
+  },
+  {
+    "id": "T017",
+    "fase": "H4",
+    "historia": null,
+    "dependencias": [
+      "T015",
+      "T016"
+    ],
+    "requisitos": [
+      "ACT-16"
+    ],
+    "objetivo": "Confirmar revisión del equipo, remoto y aceptación",
+    "archivo": "docs/H3/CIERRE_Y_H4.md",
+    "criterio": "Entrega preparada; responsables, defensa, aceptación académica y remoto no se presumen aprobados ni requieren nuevos ensayos físicos",
+    "estado": "Pendiente externo",
+    "responsable": "Equipo ARGOS; reparto individual por confirmar"
+  }
+]

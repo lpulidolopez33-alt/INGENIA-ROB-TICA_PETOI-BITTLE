@@ -1,0 +1,17 @@
+{
+  "estado": "PASS",
+  "pruebas_extraidas": ".........................                                                [100%]\n25 passed in 1.02s",
+  "simulacion": "Órdenes: siéntate, de pie/levántate, camina/adelante, corre, atrás, izquierda, derecha, saluda/hola, flexiones, estira, descansa, BAILA, PARA/quieto\nPuedes encadenar órdenes con 'y después'. PARA cancela toda la cola.\n\n⌨  Modo texto: escribe la orden y pulsa Enter (Ctrl+C para salir)\n\n> 🗣  «sientate y ponte de pie» -> sentarse → ponerse de pie\n   En cola: 2 acción(es) pendientes\n>    ▶ Ejecutando: sentarse (ksit)\n   [SIMULADO] se enviaría: 'ksit'\n   ▶ Ejecutando: ponerse de pie (kup)\n   [SIMULADO] se enviaría: 'kup'\n\nSaliendo...\n   [SIMULADO] se enviaría: 'krest'\n",
+  "errores_simulacion": "",
+  "orden_comprobado": [
+    "ksit",
+    "kup",
+    "krest"
+  ],
+  "sin_hardware": true,
+  "dependencias": "Entorno existente Python 3.12.10 reutilizado; sin nueva instalación",
+  "alcance": "Copia independiente del candidato, mismos fuentes que entrega final; metadatos de cierre y manifiesto se regeneran después",
+  "pendientes": "Voz real sistemática, firmware y ensayos físicos supervisados, CR-01 y aceptación académica",
+  "nota_vigencia": "Registro de verificación anterior conservado. Los pendientes descritos corresponden a esa fecha; estado vigente en docs/REVISION_MOODLE.md y docs/H3/CR-01.md.",
+  "clasificacion": "HISTORICA: resultado anterior, no describe la versión definitiva"
+}

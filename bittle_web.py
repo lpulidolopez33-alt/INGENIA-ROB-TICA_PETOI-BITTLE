@@ -38,6 +38,7 @@ class Panel:
             return {"conexion": self.conexion, "microfono": self.microfono,
                     "nivel": self.nivel, "ultima_frase": self.ultima_frase,
                     "error": self.error, "eventos": list(self.eventos),
+                    "transporte": self.enlace.estado() if callable(getattr(self.enlace, "estado", None)) else None,
                     "cola": self.cola.estado() if self.cola else {"actual": None, "pendientes": [], "error": None}}
 
     def conectar(self, modo="simulado", puerto="", segundos=3):
@@ -71,6 +72,8 @@ class Panel:
         with self.lock:
             if self.conexion not in ("conectado", "simulado"):
                 raise ValueError("Conecta o inicia la simulación primero")
+            if not isinstance(texto, str):
+                return False
             self.ultima_frase = texto
             comandos = bittle.buscar_comandos(texto)
             if not comandos:
@@ -138,7 +141,7 @@ class Panel:
                     muestras = array.array("h", datos)
                     nivel = min(100, round(math.sqrt(sum(x*x for x in muestras) / max(1, len(muestras))) / 32768 * 500))
                     final = rec.AcceptWaveform(datos)
-                    texto = json.loads(rec.Result()).get("text", "").strip() if final else ""
+                    texto = bittle.texto_reconocido(rec.Result()) if final else ""
                     with self.lock:
                         if parar.is_set():
                             break

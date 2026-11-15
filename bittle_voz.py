@@ -257,6 +257,10 @@ class ColaAcciones:
                     if generacion == self._generacion:
                         self._pendientes.clear()
                         self._generacion += 1
+                    else:
+                        # Solo la parada explícita sobrevive al fallo. Descartar
+                        # también acciones añadidas detrás de ella durante el envío.
+                        self._pendientes = deque(x for x in self._pendientes if x[0] == "kbalance")
                 print(f"   ⚠ Error enviando a Bittle; secuencia cancelada: {exc}")
             finally:
                 with self._cv:
@@ -299,6 +303,8 @@ def buscar_comando(texto):
 
 def buscar_comandos(texto):
     """Lee acciones en orden, sin duplicar alias solapados; parada prioritaria."""
+    if not isinstance(texto, str):
+        return []
     palabras = re.findall(r"\w+", normalizar(texto))
     if set(palabras) & {"para", "quieto", "alto", "stop"}:
         return [COMANDOS["para"]]
@@ -331,6 +337,8 @@ class EnlaceSimulado:
 class EnlaceSerie:
     def __init__(self, puerto, baudios):
         self.puerto, self.baudios, self.s = puerto, baudios, None
+        self._bloqueado = False
+        self.ultimo_envio = {"token": None, "fase": "sin_envio", "resultado": "sin_envio"}
         self._abrir()
 
     def _abrir(self):
@@ -339,48 +347,58 @@ class EnlaceSerie:
         self.s = serial.Serial(self.puerto, self.baudios, timeout=1, write_timeout=2)
         # Al abrir el puerto la placa se reinicia: esperar a que diga "Ready!".
         recibido, limite = "", time.monotonic() + 10
-        while time.monotonic() < limite and "Ready" not in recibido:
-            recibido += self.s.read(self.s.in_waiting or 1).decode("ascii", "ignore")
-        self.s.reset_input_buffer()
+        try:
+            while time.monotonic() < limite and "Ready" not in recibido:
+                recibido += self.s.read(self.s.in_waiting or 1).decode("ascii", "ignore")
+            self.s.reset_input_buffer()
+        except Exception:
+            self.cerrar()
+            raise
         print("Conectado. Bittle listo." if "Ready" in recibido else "Conectado (sin confirmación de arranque).")
 
-    def _reconectar(self):
-        print("   🔌 Se perdió la conexión con Bittle. Reconectando... "
-              "(si se repite, carga la batería)")
-        try:
-            self.s.close()
-        except Exception:
-            pass
-        self.s = None
-        self._abrir()
-
     def enviar(self, token):
-        try:
-            if self.s is None:
-                self._reconectar()
-            self._escribir(token)
-        except Exception:
-            if token.startswith("i"):
-                self.s = None  # a mitad de coreografía no se reintenta; la próxima orden reconecta
-                raise
-            self._reconectar()  # una vez; si falla, el error llega al usuario
-            self._escribir(token)
+        if self._bloqueado:
+            raise RuntimeError("Enlace serie bloqueado tras fallo; desconecta y conecta de nuevo. "
+                               "Último resultado: " + self.ultimo_envio["resultado"])
+        self._escribir(token)
+
+    def estado(self):
+        return {**self.ultimo_envio, "requiere_reconexion": self._bloqueado}
 
     def _escribir(self, token):
-        self.s.write((token + "\n").encode("ascii"))
-        self.s.flush()
-        if token.startswith("i"):  # movimientos rápidos encadenados: no esperar ni imprimir
-            self.s.reset_input_buffer()
-            return
-        time.sleep(0.1)
-        if self.s.in_waiting:
-            resp = self.s.read(self.s.in_waiting).decode("ascii", "replace").strip()
-            if resp:
-                print(f"   Bittle: {resp}")
+        fase = "antes_escritura"
+        try:
+            datos = (token + "\n").encode("ascii")
+            if self.s is None or not self.s.is_open:
+                raise OSError("Puerto serie cerrado")
+            fase = "escritura"
+            escritos = self.s.write(datos)  # Exactamente un intento; nunca repetir tras excepción.
+            if escritos != len(datos):
+                raise OSError(f"Escritura incompleta: {escritos}/{len(datos)} bytes")
+            fase = "vaciado"
+            self.s.flush()
+            fase = "lectura_respuesta"
+            if token.startswith("i"):
+                self.s.reset_input_buffer()
+            else:
+                time.sleep(0.1)
+                if self.s.in_waiting:
+                    resp = self.s.read(self.s.in_waiting).decode("ascii", "replace").strip()
+                    if resp:
+                        print(f"   Bittle: {resp}")
+            self.ultimo_envio = {"token": token, "fase": "fin_transporte",
+                                 "resultado": "enviado_sin_confirmacion_fisica"}
+        except Exception as exc:
+            resultado = "no_enviado" if fase == "antes_escritura" else "desconocido"
+            self.ultimo_envio = {"token": token, "fase": fase, "resultado": resultado}
+            self._bloqueado = True
+            raise RuntimeError(f"Serie: {resultado} ({fase}); sin reenvío. "
+                               f"Desconecta y conecta de nuevo. {exc}") from exc
 
     def cerrar(self):
-        if self.s is not None:
-            self.s.close()
+        serie, self.s = self.s, None
+        if serie is not None:
+            serie.close()
 
 
 class EnlaceBLE:
@@ -441,6 +459,16 @@ class EnlaceBLE:
 
 
 # ---------------------------------------------------------------- entrada
+def texto_reconocido(resultado):
+    """Solo texto final válido; no aceptar JSON parcial, valores no textuales ni residuos."""
+    try:
+        dato = json.loads(resultado)
+    except (ValueError, TypeError):
+        return ""
+    texto = dato.get("text") if isinstance(dato, dict) else None
+    return texto.strip() if isinstance(texto, str) else ""
+
+
 def escuchar_microfono(ruta_modelo, dispositivo):
     """Generador de frases reconocidas por el micrófono (escucha continua)."""
     import sounddevice as sd
@@ -463,7 +491,7 @@ def escuchar_microfono(ruta_modelo, dispositivo):
         print("\n🎤 Escuchando... habla cuando quieras (Ctrl+C para salir)\n")
         while True:
             if rec.AcceptWaveform(audio.get()):
-                texto = json.loads(rec.Result()).get("text", "").strip()
+                texto = texto_reconocido(rec.Result())
                 if texto:
                     yield texto
 

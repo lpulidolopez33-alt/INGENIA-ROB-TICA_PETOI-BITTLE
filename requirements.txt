@@ -1,3 +1,3 @@
+# Entorno completo para desarrollo y pruebas de la aplicación final.
+-r requirements-bittle.txt
 pytest==9.2.0
-pyserial==3.5
-# Voz real opcional: instalar requirements-voz.txt

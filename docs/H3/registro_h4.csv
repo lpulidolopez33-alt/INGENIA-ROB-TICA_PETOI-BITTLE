@@ -1,0 +1,13 @@
+caso,fecha,operador,observador,autorizacion,commit,configuracion,ACT,entrada,esperado,texto_reconocido,tokens,observado,incidencia,veredicto,evidencia
+VOZ-01,,,,,,,ACT-03,siéntate,solo ksit,,,,,SIN REGISTRO ESPECIFICO,
+VOZ-02,,,,,,,ACT-03,ponte de pie,solo kup,,,,,SIN REGISTRO ESPECIFICO,
+VOZ-03,,,,,,,ACT-04,siéntate y vuela,ninguna nueva acción,,,,,SIN REGISTRO ESPECIFICO,
+VOZ-04,,,,,,,ACT-04,conversación ajena al sistema,ninguna nueva acción,,,,,SIN REGISTRO ESPECIFICO,
+VOZ-05,,,,,,,ACT-04,silencio durante intervalo acordado,ninguna nueva acción,,,,,SIN REGISTRO ESPECIFICO,
+FIS-01,,,,,,,ACT-03,siéntate,postura sentada conforme a firmware autorizado,,,,,SIN REGISTRO ESPECIFICO,
+FIS-02,,,,,,,ACT-03,ponte de pie,postura prevista conforme a firmware autorizado,,,,,SIN REGISTRO ESPECIFICO,
+FIS-03,,,,,,,ACT-04,entrada no reconocida,ningún movimiento nuevo originado por esa entrada,,,,,SIN REGISTRO ESPECIFICO,
+USR-06,,,,,,,,Acción individual por voz; frase no indicada,,,,El Bittle reconoce y ejecuta correctamente,,CONFIRMADO POR EQUIPO,validacion_usuario.md; comunicación 2026-11-13; fecha de ensayo no indicada
+USR-07,,,,,,,,Varias acciones por voz; frases no indicadas,,,,Encola y realiza toda la secuencia,,CONFIRMADO POR EQUIPO,validacion_usuario.md; comunicación 2026-11-13; fecha de ensayo no indicada
+USR-08,,,,,,,,Silenciar micrófono durante ejecución,,,,El equipo lo utiliza para evitar entradas de ruido mientras continúa la secuencia,,CONFIRMADO POR EQUIPO,validacion_usuario.md; comunicación 2026-11-13; fecha de ensayo no indicada
+USR-09,,,,,,Simulación con micrófono; otros datos no facilitados,,Frases completas de otro contexto; texto exacto no facilitado,Ninguna acción,,,Se generan acciones reconocidas erróneamente,OPEN-03,FAIL COMUNICADO POR USUARIO,validacion_usuario.md; comunicación 2026-11-13

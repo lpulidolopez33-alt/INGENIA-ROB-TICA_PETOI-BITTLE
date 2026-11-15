@@ -1,90 +1,54 @@
 # VOICE-BITTLE — ARGOS
 
-## Panel web local
+Entrega final: control por voz española, secuencias de acciones y panel web local.
 
-Abre **INICIAR_PANEL.bat** para conectar desde una interfaz HTML, ver las
-órdenes, activar/desactivar la escucha y consultar la cola. Inicia desconectado
-y con el micrófono apagado. Instrucciones: [PANEL_WEB.md](PANEL_WEB.md).
+## Primera instalación
 
-## 🎤 Control por voz del robot real: `bittle_voz.py`
+El ZIP no incluye `.venv` ni el modelo de voz. Antes del primer arranque:
 
-Programa que hace que el perro robot **Petoi Bittle** obedezca órdenes habladas en
-español. Escucha el micrófono continuamente, reconoce la frase con **Vosk** (sin
-Internet) y envía el comando a Bittle por **Bluetooth** (puerto COM o Bluetooth LE).
-La versión recibida indicaba pruebas con Bittle real (firmware `N_240517`).
-La nueva cola está probada en software; sus tiempos físicos y el reconocimiento
-de secuencias por voz están pendientes de validación.
+1. Instala Python y las dependencias siguiendo [GUIA.md](GUIA.md).
+2. Para usar voz, descarga y extrae `vosk-model-small-es-0.42` en
+   `modelos/vosk-model-small-es-0.42`, como explica la sección «Modelo de español».
+3. Abre `INICIAR_PANEL.bat` y selecciona **Simulación** para comprobarlo sin robot.
 
-**Secuencias:** di «siéntate y después ponte de pie» o añade órdenes mientras
-ejecuta otra. Consulta [uso y límites de la cola](SECUENCIAS.md).
-Los PDF y la presentación existentes son anteriores a esta actualización.
+La simulación con texto o botones no necesita el modelo. La simulación con voz sí
+lo necesita y usa el micrófono real. No hay un instalador automático del modelo.
 
-| Material | Archivo |
-|---|---|
-| Programa | [bittle_voz.py](bittle_voz.py) |
-| Guía paso a paso para principiantes (VS Code) | [GUIA_PASO_A_PASO.md](GUIA_PASO_A_PASO.md) · [PDF](GUIA_PASO_A_PASO.pdf) |
-| Presentación de clase | [Presentacion_Bittle_por_voz.pptx](Presentacion_Bittle_por_voz.pptx) · [PDF](Presentacion_Bittle_por_voz.pdf) |
+## Ejecutar
 
-### Inicio rápido (PowerShell, desde esta carpeta)
+Abre **INICIAR_PANEL.bat** o ejecuta desde esta carpeta:
 
 ```powershell
-py -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements-bittle.txt
+.\.venv\Scripts\python.exe -X utf8 bittle_web.py
 ```
 
-Descargar el modelo de voz español (~39 MB, no se incluye en el repositorio) desde
-<https://alphacephei.com/vosk/models/vosk-model-small-es-0.42.zip> y descomprimirlo en
-`modelos/vosk-model-small-es-0.42`.
+El panel se abre en http://127.0.0.1:8765, sin conexión y con micrófono apagado.
+Primera instalación y modelo externo: [GUIA.md](GUIA.md).
+Uso: [PANEL_WEB.md](PANEL_WEB.md). Cola: [SECUENCIAS.md](SECUENCIAS.md).
 
-```powershell
-.\.venv\Scripts\python.exe bittle_voz.py --simulado        # sin robot: muestra lo que enviaría
-.\.venv\Scripts\python.exe bittle_voz.py --listar          # puertos COM, micrófonos y Bluetooth LE
-.\.venv\Scripts\python.exe bittle_voz.py --puerto COM7     # Bittle por Bluetooth clásico
-.\.venv\Scripts\python.exe bittle_voz.py --ble             # Bittle por Bluetooth LE
-```
+## Documentación de entrega
 
-**Órdenes:** siéntate, de pie/levántate, camina/adelante, corre, atrás, izquierda,
-derecha, saluda/hola, flexiones, estira, descansa/duerme, **baila** (coreografía casera),
-**cristiano** (celebración «SIUUU» casera) y **para/quieto/alto**, que cancelan
-la cola y solicitan equilibrio. La parada física depende del reconocimiento y del enlace.
-Ctrl+C cancela la cola e intenta dejar a Bittle en reposo antes de salir.
+- [Índice integral](PROYECTO.md).
+- [H1 vigente](docs/h1/H1_v0.4.md) · [PDF](docs/h1/H1_v0.4.pdf).
+- [Especificación H2](specs/001-voice-bittle-spec/spec.md) y [arquitectura](specs/001-voice-bittle-spec/plan.md).
+- [Informe H3](docs/H3/informe_desarrollo.md) y [resultados](evidencias/actual/RESULTADOS.md).
+- [Metodología y uso real de Spec Kit](docs/METODOLOGIA.md).
 
----
+La carpeta incluye solo aplicación final, documentación vigente y sus pruebas.
+El código y documentos anteriores no son necesarios para ejecutarla y no se distribuyen.
+El modelo Vosk y las dependencias se instalan aparte. El modelo instalado en el
+ordenador de desarrollo no se incorpora al ZIP; cada destinatario debe instalarlo.
 
-## Proyecto original ARGOS (H3, solo simulación)
+PARA solicita equilibrio y cancela pendientes; no garantiza parada física.
+Desconectar intenta descanso. Cerrar la pestaña no cierra Python ni el micrófono.
 
-Aplicación Python para cuatro intenciones ES/EN: sentarse (`ksit`), ponerse de
-pie (`kup`), historial y estado. Solo las dos primeras generan escrituras.
+Estado de entrega, evolución del alcance y pendientes académicos: [Cierre y H4](docs/H3/CIERRE_Y_H4.md).
 
-**Estado H3:** consola funcional con simuladores y adaptadores Vosk/serie
-probados con dobles. **Modo físico bloqueado**; ningún ensayo con Bittle realizado.
-H1 vigente: `docs/h1/H1_v0.2.pdf` (borrador, 13 escenarios, 7 necesidades,
-34 requisitos y OPEN-01…15). No se modifica el H1 ni se aprueban sus parámetros.
+## Uso de voz acordado
 
-## Inicio rápido (PowerShell, desde esta carpeta)
+Usar el panel con el micrófono apagado salvo al dictar: activar, esperar Escuchando,
+decir la orden o secuencia, comprobar su aceptación y desactivar inmediatamente.
+La cola sigue ejecutándose con la escucha apagada; para cancelar se pulsa PARA en
+el panel. Es una operación manual, no un modo automático ni una confirmación previa.
+Procedimiento y límites: [estrategia de escucha](PANEL_WEB.md#estrategia-de-escucha-manual-acordada).
 
-```powershell
-py -3.12 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe voice_bittle.py --demo
-.\.venv\Scripts\python.exe voice_bittle.py
-.\.venv\Scripts\python.exe -m pytest -q
-.\.venv\Scripts\python.exe tools/generar_evidencias.py
-```
-
-No hace falta activar el entorno ni cambiar la política de ejecución de PowerShell.
-En consola: `/activar`, escribir «siéntate», `/fin`, «historial», «estado», `/salir`.
-Escribir texto en modo fake **no es reconocimiento de audio**.
-
-- [Guía práctica Windows](GUIA.md): instalación, modelos, voz real sobre enlace simulado y comandos.
-- [Informe de desarrollo](docs/H3/informe_desarrollo.md): cambios, resultados y límites.
-- [Preprueba física](docs/H3/preprueba_fisica.md): condiciones pendientes antes de habilitar hardware.
-- [Casos](docs/H3/casos_de_prueba.md) y [resultados generados](evidencias/resultados_H3.md).
-- [Especificación](specs/001-voice-bittle-spec/spec.md), plan y tareas actualizados;
-  T001–T050 históricos preservados sin copiar la renumeración de otra rama.
-
-`--modo fisico` informa bloqueos y sale con código 2 sin abrir puertos.
-Para audio real, instalar `requirements-voz.txt` y modelos locales siguiendo GUIA.md.
-No añadir movimientos editando el JSON: la autorización de acciones es independiente.
-
-Entrega integral: empezar por [PROYECTO.md](PROYECTO.md). Resultados de la revisión final y checklist en [ENTREGA_COMPANEROS.md](docs/H3/ENTREGA_COMPANEROS.md).

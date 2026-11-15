@@ -1,41 +1,34 @@
-# Notas de investigación — VOICE-BITTLE
+# Investigación técnica y decisiones
 
-**Versión**: 0.3 · Fuente: H1 v0.2 §2.3 y §2.4 (documentación de Petoi consultada el 2026-10-26: Serial Protocol, Python API, Doc Center). Aquí solo se recogen las decisiones que sostienen el plan; el detalle y las referencias están en el H1.
+Revisión 13/11/2026. Fuentes y localizadores en [FUENTES.md](../../docs/FUENTES.md).
+Esta comparación documental no se presenta como experimento de rendimiento.
 
-## Qué puede hacer el robot
-- **Hecho (Petoi Serial Protocol):** las *skills* se invocan con un token ASCII que empieza por `k`, sensible a mayúsculas: `ksit` (sentarse), `kup` (ponerse de pie), `kbalance`, marchas `kwkF`/`kwkL`.
-- **Incertidumbre:** `kup` está documentado, pero su comportamiento desde sentado o tumbado en nuestro firmware no está comprobado (OPEN-10).
-- **Decisión:** solo `ksit` y `kup` entran en el vocabulario por voz; el enlace rechaza cualquier otro token.
+| Cuestión | Hallazgo y alternativas | Decisión y efecto en requisitos |
+|---|---|---|
+| Capacidades Bittle | REF-05 documenta habilidades con prefijo k, como sentarse, equilibrio y caminar. El catálogo efectivo depende de OpenCat/firmware | Reutilizar habilidades; no deducir soporte de todo COMANDOS a partir de dos movimientos. ACT-02, ACT-07; OPEN-02 |
+| Voz | REF-07 ofrece modelo español pequeño y configuración de vocabulario. REF-08 ofrece transcripción general multilingüe | Mantener Vosk local por compatibilidad con el ejecutable y gramática existente. Whisper no se ha integrado ni comparado en este PC. ACT-09, ACT-10; OPEN-03 |
+| Entrada controlada | Botones/texto evitan errores acústicos; escucha continua conserva manos libres, pero puede confundir conversación | Mantener las tres entradas actuales. El equipo decide usar los botones existentes de activar/desactivar: apagado salvo dictado. No se planifica pulsar para hablar, palabra de activación ni confirmación previa. ACT-03, ACT-04, ACT-15 |
+| Comunicación | REF-06 describe Python/serie y módulos Bluetooth con más de un COM. El proyecto usa pyserial directamente; la API Petoi es otra alternativa | Mantener adaptador serie pequeño y comprobable, seleccionar COM saliente explícito. El panel no usa PetoiRobot. ACT-02, ACT-13 |
+| BLE | El código CLI usa bleak; disponibilidad de servicio y característica depende del módulo | Mantener soporte separado del panel, sin prometer compatibilidad física verificada. ACT-15; OPEN-02 |
+| Ejecución | Habilidades continuas no aportan aquí confirmación física de finalización | Un ejecutor y esperas temporizadas; FIFO hasta 20 pendientes. Las duraciones son diseño, no métricas de aceptación física. ACT-05 a ACT-08 |
+| Panel | HTTP estándar y HTML/JS local evitan un framework adicional; una aplicación remota añadiría autenticación y despliegue | Limitar a loopback; no publicar ni ofrecer acceso desde móviles por la red. ACT-11, ACT-14 |
+| Simulación | Dobles capturan comandos y permiten provocar fallos sin mover el robot | Separar parser, decisión de cola y adaptación de transporte; no simular postura física. ACT-16 |
 
-## Cómo hablar con el robot
-- **Hecho:** la API Python de Petoi exige Python ≥ 3.6, pyserial 3.5 y el repositorio OpenCat completo. La documentación advierte de un posible límite del búfer serie para comandos largos (no afecta a `ksit`/`kup`).
-- **Decisión:** usar pyserial directamente y tratar el módulo Bluetooth como un puerto serie. Así el enlace se sustituye por `FakeSerial` en las pruebas y no se depende del repositorio OpenCat.
-- **Incertidumbre:** módulo Bluetooth, emparejamiento y puerto (OPEN-15); terminador del comando (OPEN-02/15, T037 histórico).
+## Restricciones y evaluación de viabilidad
 
-## Modelo de Bittle
-- **Hecho:** la documentación consultada cubre Bittle legacy y Bittle X, no el Bittle X V2 (que tiene guía propia).
-- **Incertidumbre:** el modelo del equipo está sin comprobar (OPEN-02). Condiciona comandos, conexiones y latencia.
+Windows y Python 3.12.10 son el entorno ensayado; requirements-bittle.txt fija
+las dependencias directas. El modelo español se descarga aparte y la captura del panel
+usa PCM mono a 16 kHz. La conexión implementada usa 115200 y LF, que debe verificarse
+con el módulo concreto. COM6 es un dato local comunicado, no una configuración universal.
+La fuente oficial describe cómo formar comandos, pero no prueba que kup u otras habilidades
+del catálogo estén presentes en este firmware. La confirmación nominal del usuario no
+sustituye una matriz de compatibilidad.
 
-## Reconocimiento de voz
-- **Decisión del equipo:** Vosk con modelos locales ES/EN, cargados por ruta (nunca descargados en ejecución), para cumplir RR-03.
-- **Gramática:** decodificación abierta; el traductor valida las frases. No se fuerza una gramática de cuatro órdenes sobre ruido.
-- **Confianza:** se calcula como la mínimo de confianza por palabra. Si Vosk no entrega un valor utilizable, hay que replantear el umbral U (OPEN-03/04).
-- **Pendiente de validar:** precisión, latencia y funcionamiento sin conexión (OPEN-03; ensayo manual de GUIA.md).
+## Riesgos de las decisiones
 
-## Diseño sin hardware
-- **Decisión:** dos interfaces (`Recognizer`, `SerialPort`) y un reloj inyectable. Permiten verificar lógica, interfaces y tiempos sin micrófono ni robot, y mantienen el núcleo independiente del motor de voz.
-- **Límite:** el sustituto no emula posturas ni latencia real; eso exige ensayo físico.
-
-## Revisión 2026-11-12
-
-Fuentes oficiales y límites de aplicabilidad en docs/H3/preprueba_fisica.md.
-No se ha identificado el robot real ni confirmado su `kup`, velocidad o terminador.
-Vosk seleccionado no significa validado. Fuentes de integración:
-[instalación](https://alphacephei.com/vosk/install),
-[modelos](https://alphacephei.com/vosk/models),
-[ejemplo de captura](https://github.com/alphacep/vosk-api/blob/master/python/example/test_microphone.py).
-La gramática restringida es una medida de diseño, no una medición de falsos positivos.
-Se mantiene la mínimo de confianza como experimental; no cambiar U sin ensayo/revisión.
-La entrega usa consola y avisos visuales; motor de voz y validación de usabilidad pendientes.
-
-Nota de revisión final: captura Vosk nueva por petición, solo resultados finales con palabras coherentes; silencio PCM nulo descartado; identidad y caducidad por captura. Confianza mínima por palabra experimental, no calibrada. Ver docs/H3/ENTREGA_COMPANEROS.md.
+Gramática restringida no equivale a comprensión de conversación. Una transcripción
+incorrecta que coincida con una orden puede ejecutarse. PARA tiene prioridad incluso
+en frases que la contienen sin intención de detener. El riesgo anterior de duplicar una escritura incierta se corrige eliminando el
+reenvío automático. Una operación en curso puede demorar la parada. La selección
+BLE y el cierre físico no tienen caracterización completa disponible; no se exigen nuevos ensayos. El registro [de asuntos abiertos](../../docs/h1/ASUNTOS_ABIERTOS.md)
+define responsables, impacto y resolución sin inventar parámetros acústicos o físicos.

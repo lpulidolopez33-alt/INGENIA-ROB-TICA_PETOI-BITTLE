@@ -1,53 +1,30 @@
-# Modelo de datos — VOICE-BITTLE
+# Modelo de datos actual
 
-**Versión**: 0.3 · Refleja el código de `src/`.
+Versión documental 0.5 · Datos en memoria, no esquema de base de datos.
 
-## Entidades
-
-| Entidad | Campos | Reglas |
+| Entidad | Campos / estructura | Semántica |
 |---|---|---|
-| **Intención** (`vocabulario`) | `id`, `tipo` (movimiento \| consulta), `token` (solo movimientos), `descripcion`, `frases` por idioma | Vocabulario cerrado en `vocabulario.json`. Solo `ksit` y `kup` son tokens permitidos |
-| **Resultado de reconocimiento** (`voz`) | `texto`, `confianza`, `inicio`, `fin` | `None` = silencio. El reconocedor no decide si es una orden válida |
-| **Interpretación** (`traductor`) | `intencion`, `motivo` | `motivo`: `None` (válida), `silencio`, `no_reconocida` o `baja_confianza` |
-| **Estado** (`estado`) | `DESCONECTADO`, `REPOSO`, `EJECUTANDO`, `DESCONOCIDO` + indicador `escucha` | Sin enlace no se mueve; con acción en curso se rechaza sin encolar |
-| **Estado de movimiento** (controlador) | `reposo`, `en_curso`, `finalizado`, `estimado`, `desconocido` | «finalizado» solo con evidencia física observada; enviar no equivale a ejecutar |
-| **Evento de registro** (`registro`) | `fecha`, `hora`, `texto`, `intencion`, `confianza`, `resultado`, `motivo`, `tipo_error` (+ campos extra) | `resultado`: `aceptada`, `rechazada`, `enviada` o `error` |
-| **Aviso** (`avisos`) | `codigo`, `texto`, `momento` | Visual y, si hay motor, también por voz |
-| **No conformidad física** | evento `error` con `tipo_error=resultado_fisico_incorrecto`, `comando`, `observado`, `veredicto` | ESC-06: se registra antes de repetir el ensayo |
+| Comando | tupla (token, descripción) | Procede de COMANDOS, no de carga serie arbitraria del usuario |
+| Frase | cadena normalizada; lista de comandos | Orden de aparición; desconocida rechaza lote salvo parada |
+| Cola | deque de comandos, generación, cerrada, activa, actual, error | 20 pendientes por defecto; acción actual aparte; error conserva último texto |
+| Coreografía | lista (orden, espera) | Habilidad, articulación, ESPERA o DI:; tiempos en segundos |
+| Conexión del panel | desconectado / conectando / simulado / conectado / desconectando | Estado de sesión/apertura, no vigilancia física continua |
+| Micrófono | apagado / cargando / escuchando; Event de cancelación | Apagado indica que no acepta voz; el cierre material del hilo puede terminar después |
+| Audio del panel | queue de 8 pares (PCM bytes, estado del dispositivo) | 4000 muestras/bloque; descarta sesión al saturarse |
+| Nivel | entero 0…100 | RMS escalado; no dBA, confianza ni detección garantizada de habla |
+| Última frase | texto | Incluye voz, teclado o botón, aceptado o rechazado |
+| Evento web | hora HH:MM:SS, texto | Máximo 40; más reciente primero; sin fecha, intención estructurada ni persistencia |
+| Error de sesión | cadena | Último error de conexión/micrófono; puede persistir hasta nueva activación/conexión |
 
-## Relaciones
+`Panel.estado()` entrega instantánea bajo bloqueo; `ColaAcciones.estado()` contiene
+actual, pendientes y error. No existe campo ACK, postura observada o fin físico.
+Los errores de cola no son necesariamente entradas en la lista de eventos: se exponen
+por su propio campo. La lista satisface el alcance de actividad reciente ACT-11, no un registro persistente completo; esa obligación anterior se retiró.
 
-- Una entrada de voz produce un resultado de reconocimiento o ninguno (silencio).
-- Una interpretación válida de movimiento, si el estado lo permite, genera un envío de su token; una consulta nunca llega al enlace.
-- Cada entrada y cada fallo producen un evento de registro (RM-01, RM-02).
-- Una pérdida de enlace pasa el estado a `DESCONECTADO` y el movimiento a `desconocido`; reconectar no reenvía nada.
 
-## Vocabulario de resultados
 
-| Situación | `resultado` | `motivo` / `tipo_error` |
-|---|---|---|
-| Movimiento enviado | `enviada` | — |
-| Consulta atendida | `aceptada` | — |
-| Fuera de vocabulario o idioma | `rechazada` | `no_reconocida` |
-| Confianza < U | `rechazada` | `baja_confianza` |
-| Silencio | `rechazada` | `silencio` |
-| Acción en curso | `rechazada` | `accion_en_curso` |
-| Sin enlace | `rechazada` | `sin_enlace` |
-| Fallo de escritura | `error` | `error_escritura` |
-| Pérdida de enlace | `error` | `perdida_enlace` |
-| Micrófono caído | `error` | `microfono_no_disponible` |
-| Modelo de voz no carga | `error` | `modelo_voz` |
+El transporte serie conserva token/fase/resultado y un bloqueo tras fallo. Estado
+inicial sin_envio; no_enviado antes de write; desconocido si write ya se invocó;
+enviado_sin_confirmacion_fisica tras completar I/O. El bloqueo no se elimina por una
+nueva orden: se crea una sesión nueva al desconectar/conectar. No se persiste la cola.
 
-## Extensiones H3 (2026-11-12)
-
-- Resultado: `fin_monotonic` opcional y `origen_tiempo` (simulado/estimado_vosk).
-- Confianza finita numérica [0,1], sin booleanos; resultado mal formado rechazado.
-- Acciones fijadas en `seguridad.py`, independientes de frases editables.
-- `modelo_listo` y escucha activa bloquean movimientos cuando faltan.
-- Reconexión deja estado DESCONOCIDO. `confirmar_reposo(evidencia)` es manual;
-  no transmite ni confirma una postura por una escritura.
-- `PuertoSerieReal(PerfilFisico, fabrica)` permite pruebas con dobles. Construir
-  no abre; `habilitar(referencia_sesion)` necesita aprobaciones declaradas por humanos.
-- Final físico sin evidencia no libera el bloqueo; simulación puede finalizar con estado estimado.
-
-Nota de revisión final: captura Vosk nueva por petición, solo resultados finales con palabras coherentes; silencio PCM nulo descartado; identidad y caducidad por captura. Confianza mínima por palabra experimental, no calibrada. Ver docs/H3/ENTREGA_COMPANEROS.md.
