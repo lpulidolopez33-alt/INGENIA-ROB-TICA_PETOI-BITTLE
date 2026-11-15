@@ -5,6 +5,12 @@ Vincula: requisito (H1 v0.2) -> casos TEST-xx -> resultado -> versión (commit G
 Además comprueba que los TEST-xx de docs/H3/casos_de_prueba.md y de tests/ coinciden.
 """
 import re
+import hashlib
+import json
+import platform
+import os
+from datetime import timezone
+from importlib.metadata import version
 import subprocess
 import sys
 from collections import defaultdict
@@ -31,11 +37,14 @@ class Recolector:
     def __init__(self):
         self.casos = {}          # TEST-xx -> dict
         self.resultados = defaultdict(list)
+        self.fases = defaultdict(dict)
+        self.sin_marca = []
 
     def pytest_collection_modifyitems(self, items):
         for it in items:
             m = it.get_closest_marker("caso")
             if not m:
+                self.sin_marca.append(it.nodeid)
                 continue
             tid = m.args[0]
             info = self.casos.setdefault(tid, {"reqs": set(), "escs": set(), "nivel": None,
@@ -50,20 +59,59 @@ class Recolector:
             it.caso_id = tid
 
     def pytest_runtest_logreport(self, report):
-        if report.when == "call" or (report.when == "setup" and report.failed):
-            tid = None
-            for t, info in self.casos.items():
-                if report.nodeid in info["tests"]:
-                    tid = t
-            if tid:
-                self.resultados[tid].append(report.outcome)
+        self.fases[report.nodeid][report.when] = report.outcome
+        for tid, info in self.casos.items():
+            if report.nodeid in info["tests"]:
+                if report.when == "call" or report.outcome != "passed":
+                    self.resultados[tid].append(report.outcome)
+
+    def veredictos(self):
+        resultado = {}
+        for tid, info in self.casos.items():
+            fases = [self.fases[n] for n in info["tests"]]
+            if any("failed" in f.values() for f in fases):
+                resultado[tid] = "FAIL"
+            elif any("skipped" in f.values() for f in fases):
+                resultado[tid] = "NO EJECUTADO COMPLETO"
+            elif fases and all(all(f.get(k) == "passed" for k in ("setup", "call", "teardown")) for f in fases):
+                resultado[tid] = "PASS"
+            else:
+                resultado[tid] = "NO EJECUTADO"
+        return resultado
+
+
+def manifiesto():
+    archivos = []
+    for carpeta in ("src", "tests", "tools"):
+        archivos.extend((RAIZ / carpeta).rglob("*.py"))
+        archivos.extend((RAIZ / carpeta).rglob("*.json"))
+    archivos.extend(RAIZ / f for f in ("voice_bittle.py", "requirements.txt", "requirements-voz.txt", "pytest.ini"))
+    hashes = {p.relative_to(RAIZ).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+              for p in sorted(archivos) if p.is_file()}
+    digest = hashlib.sha256(json.dumps(hashes, sort_keys=True).encode()).hexdigest()
+    return {"sha256_conjunto": digest, "archivos": hashes}
+
+
+def estado_requisito(requisito):
+    pendientes = {
+        "RD-02": "Dobles del adaptador; falta Vosk con modelos ES/EN reales",
+        "RR-03": "Inspección estática; falta reconocimiento real sin Internet",
+        "RR-01": "Rechazo lógico probado; precisión no medida (OPEN-13)",
+        "RR-02": "Latencia simulada; estimación Vosk con dobles, sin medida física",
+        "RF-03": "Registro/estado simulado; postura física no observada",
+        "RS-03": "Controles software auxiliares; intervención independiente pendiente",
+    }
+    return pendientes.get(requisito, "Casos software PASS; alcance parcial, integración/aceptación pendiente")
 
 
 def commit() -> str:
     try:
-        return subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=RAIZ,
+        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=RAIZ,
                                        text=True, stderr=subprocess.DEVNULL).strip()
     except Exception:
+        version_archivo = RAIZ / "VERSION_ENTREGA.json"
+        if version_archivo.exists():
+            return json.loads(version_archivo.read_text(encoding="utf-8"))["commit_base"] + " (exportado)"
         return "sin-commit"
 
 
@@ -73,12 +121,27 @@ def ids_en_documento() -> set:
 
 
 def main() -> int:
+    os.chdir(RAIZ)
     rec = Recolector()
     rc = pytest.main(["-q", "-p", "no:cacheprovider", str(RAIZ / "tests")], plugins=[rec])
-    veredicto = {t: ("PASS" if r and all(x == "passed" for x in r) else "FAIL")
-                 for t, r in rec.resultados.items()}
-    ahora = datetime.now().strftime("%Y-%m-%d %H:%M")
-    cab = f"Versión del software: commit `{commit()}` (+ cambios sin commitear si los hay) · {ahora}\n"
+    veredicto = rec.veredictos()
+    ahora = datetime.now(timezone.utc).isoformat()
+    identidad = manifiesto()
+    try:
+        estado_git = subprocess.check_output(["git", "status", "--porcelain"], cwd=RAIZ, text=True)
+    except Exception:
+        estado_git = "Git no disponible"
+    metadatos = {"commit_base": commit(), "fecha_utc": ahora, "python": platform.python_version(),
+                 "pytest": version("pytest"), "estado_git_al_ejecutar": estado_git,
+                 "exit_code_pytest": int(rc), "pruebas": len(rec.fases),
+                 "alcance": "sin micrófono, sin Vosk real y sin puertos físicos; dobles e inspección",
+                 **identidad}
+    (RAIZ / "evidencias/ejecucion_H3.json").write_text(json.dumps(metadatos, indent=2, ensure_ascii=False), encoding="utf-8")
+    cab = (f"Commit base `{commit()}` · {ahora}\n\n"
+           f"SHA-256 del conjunto de código/configuración/pruebas: `{identidad['sha256_conjunto']}`. "
+           "Manifiesto y cambios locales en `ejecucion_H3.json`.\n\n"
+           f"Python {platform.python_version()}, pytest {version('pytest')}; {len(rec.fases)} pruebas; "
+           f"código de salida {rc}. Solo simulación/dobles/inspección. PASS no acredita un requisito completo.\n")
 
     # ---- resultados
     L = ["# Resultados de pruebas H3 (sin robot)\n", cab,
@@ -103,8 +166,7 @@ def main() -> int:
         casos = sorted(por_req.get(r, []))
         modo = MODO[r]
         if casos and all(veredicto.get(c) == "PASS" for c in casos):
-            estado = "Verificado sin robot" if (modo == "software") else \
-                     "Parte software verificada; falta ensayo con hardware"
+            estado = estado_requisito(r)
         elif casos:
             estado = "**FALLO**"; huecos.append(r)
         else:
@@ -123,8 +185,9 @@ def main() -> int:
     print(f"Casos: {ok}/{total} PASS")
     if solo_doc: print("En el documento pero sin prueba automática:", sorted(solo_doc))
     if solo_tests: print("En tests pero no documentados:", sorted(solo_tests))
+    if rec.sin_marca: print("Pruebas sin identificador:", rec.sin_marca)
     if huecos: print("Requisitos software sin prueba o con fallo:", huecos)
-    return 0 if (rc == 0 and not solo_doc and not solo_tests and not huecos) else 1
+    return 0 if (rc == 0 and not solo_doc and not solo_tests and not huecos and not rec.sin_marca) else 1
 
 
 if __name__ == "__main__":

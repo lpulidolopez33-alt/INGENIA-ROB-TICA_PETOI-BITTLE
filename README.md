@@ -1,58 +1,5 @@
 # VOICE-BITTLE — ARGOS
 
-## Panel web local
-
-Abre **INICIAR_PANEL.bat** para conectar desde una interfaz HTML, ver las
-órdenes, activar/desactivar la escucha y consultar la cola. Inicia desconectado
-y con el micrófono apagado. Instrucciones: [PANEL_WEB.md](PANEL_WEB.md).
-
-## 🎤 Control por voz del robot real: `bittle_voz.py`
-
-Programa que hace que el perro robot **Petoi Bittle** obedezca órdenes habladas en
-español. Escucha el micrófono continuamente, reconoce la frase con **Vosk** (sin
-Internet) y envía el comando a Bittle por **Bluetooth** (puerto COM o Bluetooth LE).
-La versión recibida indicaba pruebas con Bittle real (firmware `N_240517`).
-La nueva cola está probada en software; sus tiempos físicos y el reconocimiento
-de secuencias por voz están pendientes de validación.
-
-**Secuencias:** di «siéntate y después ponte de pie» o añade órdenes mientras
-ejecuta otra. Consulta [uso y límites de la cola](SECUENCIAS.md).
-Los PDF y la presentación existentes son anteriores a esta actualización.
-
-| Material | Archivo |
-|---|---|
-| Programa | [bittle_voz.py](bittle_voz.py) |
-| Guía paso a paso para principiantes (VS Code) | [GUIA_PASO_A_PASO.md](GUIA_PASO_A_PASO.md) · [PDF](GUIA_PASO_A_PASO.pdf) |
-| Presentación de clase | [Presentacion_Bittle_por_voz.pptx](Presentacion_Bittle_por_voz.pptx) · [PDF](Presentacion_Bittle_por_voz.pdf) |
-
-### Inicio rápido (PowerShell, desde esta carpeta)
-
-```powershell
-py -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements-bittle.txt
-```
-
-Descargar el modelo de voz español (~39 MB, no se incluye en el repositorio) desde
-<https://alphacephei.com/vosk/models/vosk-model-small-es-0.42.zip> y descomprimirlo en
-`modelos/vosk-model-small-es-0.42`.
-
-```powershell
-.\.venv\Scripts\python.exe bittle_voz.py --simulado        # sin robot: muestra lo que enviaría
-.\.venv\Scripts\python.exe bittle_voz.py --listar          # puertos COM, micrófonos y Bluetooth LE
-.\.venv\Scripts\python.exe bittle_voz.py --puerto COM7     # Bittle por Bluetooth clásico
-.\.venv\Scripts\python.exe bittle_voz.py --ble             # Bittle por Bluetooth LE
-```
-
-**Órdenes:** siéntate, de pie/levántate, camina/adelante, corre, atrás, izquierda,
-derecha, saluda/hola, flexiones, estira, descansa/duerme, **baila** (coreografía casera),
-**cristiano** (celebración «SIUUU» casera) y **para/quieto/alto**, que cancelan
-la cola y solicitan equilibrio. La parada física depende del reconocimiento y del enlace.
-Ctrl+C cancela la cola e intenta dejar a Bittle en reposo antes de salir.
-
----
-
-## Proyecto original ARGOS (H3, solo simulación)
-
 Aplicación Python para cuatro intenciones ES/EN: sentarse (`ksit`), ponerse de
 pie (`kup`), historial y estado. Solo las dos primeras generan escrituras.
 

@@ -1,3 +1,23 @@
+# Nota de alineación H1 v0.2 — propuesta de revisión 2026-11-12
+
+Esta nota no ratifica una nueva versión de la constitución. Conserva abajo el texto
+histórico 1.1.0 y sus principios; su enmienda formal requiere revisión del equipo.
+Para el desarrollo H3 solicitado, la fuente de requisitos es H1 v0.2:
+
+- 13 escenarios ESC-01…13, 7 necesidades NEC-01…07, 34 requisitos (incluye RF-10), OPEN-01…15.
+- SoI unificado: robot, enlace Bluetooth, ordenador, micrófono y aplicación.
+- Vosk seleccionado; validación técnica pendiente. No mantener la antigua contradicción de selección.
+- Matriz H1 §6.1 vigente, sin equivalencias inventadas REQ/RNF.
+- RF-05 rechaza sin encolar; OPEN-11 trata avisos/consultas durante movimiento.
+- Frases canónicas de cuatro intenciones ES/EN; sin ampliación motriz.
+- Seguridad independiente, parámetros no aprobados y verificación física siguen pendientes.
+
+Las referencias antiguas a ocho escenarios, cinco necesidades, frontera ambigua,
+solo doce OPEN y pruebas de ESC-08 como resultado físico son históricas, no vigentes.
+La misión del usuario autoriza implementación H3, manteniendo el límite de no operar hardware.
+
+## Texto histórico 1.1.0 (no usar sus conteos ni correspondencias como H1 vigente)
+
 <!--
 Sync Impact Report
 Version change: 1.0.0 -> 1.1.0
